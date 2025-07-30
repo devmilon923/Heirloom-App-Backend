@@ -1,0 +1,6 @@
+node_modules
+/logs
+/dist
+.env
+/src/config/heirloom-app-523fa-firebase-adminsdk-fbsvc-e722890de5.json
+/src/config/ok.json
