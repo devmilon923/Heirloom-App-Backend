@@ -75,7 +75,7 @@ export const initSocketIO = async (server: HttpServer): Promise<void> => {
         )
       );
     }
-
+    console.log(token, "===========incoming token");
     const userDetails = verifySocketToken(token);
     if (!userDetails) {
       return next(new Error("Authentication error: Invalid token"));
@@ -91,6 +91,7 @@ export const initSocketIO = async (server: HttpServer): Promise<void> => {
   });
 
   io.on("connection", (socket: Socket) => {
+    console.log(connectedUsers, "============when connected");
     console.log("Socket just connected:", {
       socketId: socket.id,
       userId: socket.user?._id,
@@ -117,6 +118,11 @@ export const initSocketIO = async (server: HttpServer): Promise<void> => {
     });
 
     socket.on("disconnect", () => {
+      const token =
+        (socket.handshake.auth.token as string) ||
+        (socket.handshake.headers.token as string);
+      console.log(token, "==========logout");
+
       console.log(
         `${socket.user?.name} || ${socket.user?.email} || ${socket.user?._id} just disconnected with socket ID: ${socket.id}`
       );
@@ -124,13 +130,14 @@ export const initSocketIO = async (server: HttpServer): Promise<void> => {
         false,
         new Types.ObjectId(socket.user?._id)
       );
-      // Remove user from connectedUsers map
+
       for (const [key, value] of connectedUsers.entries()) {
         if (value.socketID === socket.id) {
           connectedUsers.delete(key);
           break;
         }
       }
+      console.log(connectedUsers, "===============connected");
     });
   });
 };
@@ -155,7 +162,7 @@ export const sendSocketConversation = (
   sendTo.length
     ? sendTo?.map((user) => {
         const userSocket = connectedUsers.get(user?.toString());
-   
+
         if (userSocket) {
           io.to(userSocket.socketID).emit(`getConversation`, payload);
         } else {

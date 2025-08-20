@@ -207,7 +207,7 @@ export const loginUser = catchAsync(async (req: Request, res: Response) => {
   const { email, password, fcmToken } = req.body;
 
   const user = await findUserByEmail(email);
-
+  console.log(req.body, "========================login===========");
   if (!user) {
     throw new ApiError(404, "This account does not exist.");
   }
@@ -230,6 +230,14 @@ export const loginUser = catchAsync(async (req: Request, res: Response) => {
       .catch(console.error);
 
     await saveOTP(email, otp);
+    const token = generateToken({
+      id: userId,
+      email: user.email,
+      role: user.role,
+      name: user?.name,
+      username: user?.username,
+      image: user?.image?.publicFileURL,
+    });
 
     return sendResponse(res, {
       statusCode: 401,
@@ -237,14 +245,7 @@ export const loginUser = catchAsync(async (req: Request, res: Response) => {
       message: "We've sent an OTP to your email to verify your profile.",
       data: {
         role: user.role,
-        token: generateToken({
-          id: userId,
-          email: user.email,
-          role: user.role,
-          name: user?.name,
-          username: user?.username,
-          image: user?.image?.publicFileURL,
-        }),
+        token: token,
       },
     });
   }

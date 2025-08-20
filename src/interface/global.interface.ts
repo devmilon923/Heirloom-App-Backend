@@ -5,7 +5,7 @@ export type TResponse<T> = {
   pagination?: {
     totalPage?: number;
     currentPage?: number;
-    prevPage: number;
+    prevPage?: number;
     nextPage: number;
     limit?: number;
     totalItem?: number;

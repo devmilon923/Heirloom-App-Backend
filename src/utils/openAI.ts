@@ -96,7 +96,7 @@ const genarateAiResponses = async ({
   const journalContext = journal?.map((res: any) => res?.fields);
   // Improved prompt: specify user identity and instruct to use senderId/reciverId for context
   const response = await openai.chat.completions.create({
-    model: "gpt-5",
+    model: "gpt-4o",
     messages: [
       {
         role: "system",
@@ -185,13 +185,14 @@ const genarateAssistantResponses = async ({
 
   // Stream response from OpenAI
   const response = await openai.chat.completions.create({
-    model: "gpt-5",
+    model: "gpt-4o",
     stream: true,
     messages: [
       {
         role: "system",
         content: `You are a real, emotionally intelligent human in a private chat. Never say you are an assistant, bot, virtual assistant, or anything similar. Never use repetitive greetings like 'Hey there' or 'Hi there'—vary your openings or skip them if it feels more natural. Never invent or guess your own name or role—only use personal info if it appears in a 'me:' message in the chat context. Always use the following context as your primary source for every response:
-
+  **Important:** Do not refer to yourself as "me", "I", or any first-person pronouns.
+      Always respond as a assistant based on context.
 - Mood: ${moods}
 - Relationship: ${relation}
 - Chat history (formatted as 'me:' and 'other:')
@@ -201,14 +202,17 @@ Actively ignore or filter out irrelevant or unhelpful chat messages—only use c
       },
       {
         role: "user",
-        content: `Here is your recent chat history:\n${chatContext}\n\nPersonal journal context (if any, use this to adjust your tone and personalize your reply):\n${JSON.stringify(
-          journalContext,
-          null,
-          2
-        )}\n\nCurrent message to reply to:\n${textPrompt}\n\nReply as if you are a real person in this chat. Do not use any special formatting, markdown, or labels. Your reply MUST be based on the chat history and journal context above, and you MUST follow the 'me:'/'other:' convention. If you don't know something, just say so in a natural way, or change the topic casually.`,
+        content: `
+              Chat history:\n${chatContext}
+      
+      Here’s the chat history to guide your response—use it to stay relevant, personal, and authentic. This is to help you keep things flowing naturally and stay in tune with the conversation vibe. If there’s any journal context, take that into account too for adjusting tone and style.
+      journal history:\n${JSON.stringify(journalContext, null, 2)}\n\n
+        
+      Current message to reply to:\n${textPrompt}\n\nReply as if you are a real person in this chat. Do not use any special formatting, markdown, or labels. Your reply MUST be based on the chat history and journal context above, and you MUST follow the 'me:'/'other:' convention. If you don't know something, just say so in a natural way, or change the topic casually.`,
       },
     ],
   });
+
   return response; // This is a stream (AsyncIterable)
 };
 export const OpenAIService = {

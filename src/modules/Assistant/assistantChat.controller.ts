@@ -6,6 +6,7 @@ import { AssistantChatServices } from "./assistantChat.service";
 import ApiError from "../../errors/ApiError";
 import { IUserPayload } from "../../middlewares/roleGuard";
 import paginationBuilder from "../../utils/paginationBuilder";
+import { AssistantChats } from "./assistantChat.model";
 
 const sendAssistantMessage = catchAsync(async (req: Request, res: Response) => {
   const myMessage = req.body?.me;
@@ -34,26 +35,23 @@ const getMyAssistantConversations = catchAsync(
     if (!userId) {
       throw new ApiError(httpStatus.BAD_REQUEST, "User ID is required");
     }
-    const data =
-      await AssistantChatServices.getMyAssistantConversations(userId);
-    const paginatedData = data.slice(skip, skip + limit);
+    const data = await AssistantChatServices.getMyAssistantConversations(
+      userId,
+      limit,
+      skip
+    );
+    const totalData = await AssistantChats.countDocuments({ user: userId });
     const pagination = paginationBuilder({
-      totalData: data.length,
+      totalData: totalData,
       currentPage: page,
       limit,
     });
-    // Fix prevPage/nextPage to be numbers (0 if null) for type compatibility
-    const fixedPagination = {
-      ...pagination,
-      prevPage: pagination.prevPage ?? 0,
-      nextPage: pagination.nextPage ?? 0,
-    };
-    sendResponse(res, {
+
+    return sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
       message: "Assistant conversations fetched successfully!",
-      data: paginatedData,
-      pagination: fixedPagination,
+      data: { chat: data?.reverse(), pagination },
     });
   }
 );
