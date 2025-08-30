@@ -14,10 +14,9 @@ const NotificationSchema: Schema = new Schema(
     isManagerRead: { type: Boolean, default: false },
     isUserRead: { type: Boolean, default: false },
     isAdminRead: { type: Boolean, default: false },
-
     unreadCount: { type: Number, required: true, default: 0 },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 export const NotificationModel =
