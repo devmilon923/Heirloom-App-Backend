@@ -11,38 +11,29 @@ const sendAssistantMessage = async (myMessage: string, userId: string) => {
   const vector = await OpenAIService.embedding(myMessage);
 
   // 2. Save the user message to MongoDB and Pinecone in parallel (no need to await)
-  AssistantChats.create({
-    user: new mongoose.Types.ObjectId(userId),
-    type: "me",
-    message: myMessage,
-  });
-  PineconeCollections.saveAssistantChat({
-    vector,
-    userId: userId.toString(),
-    assistant_message: "", // No assistant reply yet
-    my_message: myMessage,
-  });
+  // AssistantChats.create({
+  //   user: new mongoose.Types.ObjectId(userId),
+  //   type: "me",
+  //   message: myMessage,
+  // });
+  // PineconeCollections.saveAssistantChat({
+  //   vector,
+  //   userId: userId.toString(),
+  //   assistant_message: "", // No assistant reply yet
+  //   my_message: myMessage,
+  // });
 
-  // 3. Search Pinecone for context (can run in parallel with streaming)
-  const searchPromise = PineconeCollections.assistantchatCollection.query({
-    vector,
-    topK: 5,
-    includeMetadata: true,
-  });
-
-  // 4. Build the AI prompt for context (for saving and future reference)
-  const searchResults = await searchPromise;
-  const chatContext =
-    searchResults?.matches?.map((res: any) => res?.metadata) || [];
-  const aiPrompt = `User: ${myMessage}\nContext: ${JSON.stringify(chatContext)}`;
-
-  // 5. Stream AI response and emit via the shared socket helper
-  const chatQuery = {}; // You can enhance this to filter by user, type, etc.
-  const journalQuery = {}; // Add journal context if available
+  const chatQuery = {
+    $or: [{ senderId: userId }, { reciverId: userId }],
+  }; // You can enhance this to filter by user, type, etc.
+  const journalQuery = {
+    userId: userId,
+  }; // Add journal context if available
   const moods: TModes = "😌 Calm"; // Use a valid TModes value
   const relation: TRelation = "friend"; // Use a valid TRelation value
   const textPrompt = myMessage;
   let fullResponse = "";
+  console.log(userId);
   const stream = await OpenAIService.genarateAssistantResponses({
     chatQuery,
     journalQuery,

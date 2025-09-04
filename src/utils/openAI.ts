@@ -83,7 +83,7 @@ const genarateAiResponses = async ({
       return `${isCurrentUser ? sender_name : receiver_name}: ${fields?.chat || fields?.message || ""}`;
     })
     .join("\n");
-
+  console.log("Chat Context: ", chatContext);
   const getJournalContext: any =
     await PineconeCollections.journalCollection.searchRecords({
       query: {
@@ -94,6 +94,7 @@ const genarateAiResponses = async ({
     });
   const journal = getJournalContext?.result?.hits;
   const journalContext = journal?.map((res: any) => res?.fields);
+  console.log("Journal Context: ", journalContext);
   // Improved prompt: specify user identity and instruct to use senderId/reciverId for context
   const response = await openai.chat.completions.create({
     model: "gpt-4o",
@@ -181,9 +182,10 @@ const genarateAssistantResponses = async ({
         inputs: { text: textPrompt },
       },
     });
+  console.log("Chat context: ", chatContext);
   const journal = getJournalContext?.result?.hits;
   const journalContext = journal?.map((res: any) => res?.fields);
-
+  console.log("Journal context: ", journalContext);
   // Stream response from OpenAI
   const response = await openai.chat.completions.create({
     model: "gpt-4o",
