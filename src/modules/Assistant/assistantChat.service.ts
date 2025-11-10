@@ -11,17 +11,17 @@ const sendAssistantMessage = async (myMessage: string, userId: string) => {
   const vector = await OpenAIService.embedding(myMessage);
 
   // 2. Save the user message to MongoDB and Pinecone in parallel (no need to await)
-  // AssistantChats.create({
-  //   user: new mongoose.Types.ObjectId(userId),
-  //   type: "me",
-  //   message: myMessage,
-  // });
-  // PineconeCollections.saveAssistantChat({
-  //   vector,
-  //   userId: userId.toString(),
-  //   assistant_message: "", // No assistant reply yet
-  //   my_message: myMessage,
-  // });
+  AssistantChats.create({
+    user: new mongoose.Types.ObjectId(userId),
+    type: "me",
+    message: myMessage,
+  });
+  PineconeCollections.saveAssistantChat({
+    vector,
+    userId: userId.toString(),
+    assistant_message: "", // No assistant reply yet
+    my_message: myMessage,
+  });
 
   const chatQuery = {
     $or: [{ senderId: userId }, { reciverId: userId }],
@@ -33,7 +33,7 @@ const sendAssistantMessage = async (myMessage: string, userId: string) => {
   const relation: TRelation = "friend"; // Use a valid TRelation value
   const textPrompt = myMessage;
   let fullResponse = "";
-  console.log(userId);
+
   const stream = await OpenAIService.genarateAssistantResponses({
     chatQuery,
     journalQuery,

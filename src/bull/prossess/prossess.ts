@@ -6,8 +6,6 @@ import {
 import { UserModel } from "../../modules/user/user.model";
 import mongoose from "mongoose";
 
-import ApiError from "../../errors/ApiError";
-import httpStatus from "http-status";
 import { LegacyQueues } from "../queus/legacy.queus";
 import { Legacys } from "../../modules/legacy/legacy.model";
 import { emitNotification } from "../../utils/socket";
@@ -37,7 +35,7 @@ const triggerlagacyQueue = async (job: Job) => {
     // Send push notification first
     try {
       if (lagacy) {
-        console.log(lagacy);
+        // console.log(lagacy);
         await sendPushNotificationToMultiple(tokens, {
           body: `Hey there! This message is from ${lagacy?.user?.name || "Someone"}, and here's what they said: 
 ${lagacy?.messages || "No message available."}`,
@@ -57,10 +55,11 @@ ${lagacy?.messages || "No message available."}`,
           // Emit the notification.
           await emitNotification(notificationPayload);
         });
+        // console.log(lagacy.type);
         if (lagacy.type === "loop") {
+          // console.log("inside the loop block");
           const nextTriggerDate = new Date(lagacy.triggerDate);
           nextTriggerDate.setFullYear(nextTriggerDate.getFullYear() + 1);
-
           const result = await LegacyService.addLegacy({
             user: new mongoose.Types.ObjectId(lagacy?.user?._id),
             recipients,
