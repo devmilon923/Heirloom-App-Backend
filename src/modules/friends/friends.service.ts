@@ -152,7 +152,8 @@ const unfriendAction = async (
     {
       _id:requestId,
       $or: [
-        { sendBy: userId, reciveBy: userId },
+        { sendBy: userId },
+        { reciveBy: userId },
       ],
       status: "accepted",
     },
