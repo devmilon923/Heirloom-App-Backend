@@ -125,12 +125,12 @@ const action = catchAsync(async (req: Request, res: Response) => {
 });
 const unfriendAction = catchAsync(async (req: Request, res: Response) => {
   const userId = (req.user as IUserPayload).id;
-  const otherUserId = req.params?.requestId;
+  const requestId = req.params?.requestId;
 
   const result = await FriendServices.unfriendAction(
-    new Types.ObjectId(otherUserId),
+    new Types.ObjectId(requestId),
     new Types.ObjectId(userId),
-    new Types.ObjectId(otherUserId)
+
   );
   return sendResponse(res, {
     statusCode: httpStatus.CREATED,
