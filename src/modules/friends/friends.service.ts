@@ -145,11 +145,13 @@ const makeAction = async (
 };
 
 const unfriendAction = async (
+  requestId: Types.ObjectId,
   userId: Types.ObjectId,
   otherUserId: Types.ObjectId
 ) => {
   const result = await Friends.findOneAndUpdate(
     {
+      _id:requestId,
       $or: [
         { sendBy: userId, reciveBy: otherUserId },
         { sendBy: otherUserId, reciveBy: userId },

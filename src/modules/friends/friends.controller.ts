@@ -128,6 +128,7 @@ const unfriendAction = catchAsync(async (req: Request, res: Response) => {
   const otherUserId = req.params?.requestId;
 
   const result = await FriendServices.unfriendAction(
+    new Types.ObjectId(otherUserId),
     new Types.ObjectId(userId),
     new Types.ObjectId(otherUserId)
   );
