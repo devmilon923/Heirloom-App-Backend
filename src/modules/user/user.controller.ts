@@ -52,7 +52,7 @@ import { createClient } from "redis";
 import { cacheManagerService } from "../../utils/cacheManager";
 
 export const registerUser = catchAsync(async (req: Request, res: Response) => {
-  const { username, email, password, gender, fcmToken } = req.body;
+  const { username, email, password, gender, fcmToken, name } = req.body;
   const validUsername = !/\s/.test(username?.toLowerCase());
   if (!validUsername) {
     throw new ApiError(
@@ -606,15 +606,6 @@ export const adminloginUser = catchAsync(
         username: user?.username,
         image: user?.image?.publicFileURL,
       });
-      await cacheManagerService.setLogUser(
-        JSON.stringify({
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          image: user?.image?.publicFileURL,
-        })
-      );
 
       sendResponse(res, {
         statusCode: httpStatus.OK,

@@ -13,6 +13,7 @@ import {
 import { formatConversationData } from "../../utils/formatted";
 import { PineconeCollections } from "../../DB/pinecone";
 import { OpenAIService } from "../../utils/openAI";
+import { cacheManagerService } from "../../utils/cacheManager";
 
 const updateActiveStatus = async (status: boolean, userId: Types.ObjectId) => {
   try {
@@ -47,12 +48,6 @@ const updateConversation = async (
   reciver: Types.ObjectId,
   messageId?: Types.ObjectId
 ) => {
-  console.log(
-    sender,
-    reciver,
-    messageId,
-    "===============================sdfgsdfg="
-  );
   try {
     const conversation = await Conversations.findOneAndUpdate(
       {
@@ -449,11 +444,19 @@ const sendMessage = async (body: TMessages) => {
 
   // 4. Create the message and populate sender/receiver fields
   const result = await Messages.create(messageData);
-  const populatedResult = await Messages.findById(result._id)
+  const populatedResult: any = await Messages.findById(result._id)
     .populate("sender", "name _id") // Populate sender's name
     .populate("reciver", "name _id"); // Populate receiver's name
   console.log("=============", populatedResult);
   // 5. Perform background tasks (embedding, conversation update, socket emission)
+  await cacheManagerService.addMessageInRedisWindow({
+    windowId: body.conversation?.toString(),
+    chat: {
+      sender_name: populatedResult?.sender?.name || null,
+      sender_id: sender,
+      content: body.messages || "",
+    },
+  });
   setImmediate(async () => {
     try {
       // A. If message is text, generate embedding and save to Pinecone
@@ -504,6 +507,7 @@ const sendMessage = async (body: TMessages) => {
   // 6. Return the relation data and the populated message (immediate response)
   return { ...relationData, message: populatedResult };
 };
+
 const messageStack = async (query: any) => {
   try {
     const unreadMessage = await Messages.countDocuments(query).exec();

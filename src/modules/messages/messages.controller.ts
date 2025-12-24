@@ -98,6 +98,7 @@ const sendMessage = catchAsync(async (req: Request, res: Response) => {
             chatQuery: {
               $or: [{ senderId: receiverId }, { reciverId: receiverId }],
             },
+            //TODO: add redis cach message window also
             sender_name: result?.message?.reciver?.name,
             receiver_name: result?.message?.sender?.name,
             journalQuery: { userId: receiverId },
@@ -115,14 +116,12 @@ const sendMessage = catchAsync(async (req: Request, res: Response) => {
               sender_id: receiverId,
               content: reply || "",
               image: image?.publicFileURL || "",
-              
             },
             userId,
             receiverId,
             result,
             req.body
           );
-
         }
       }
     } catch (error) {
@@ -181,6 +180,15 @@ function emitToBothParties(
     // Use the same safeSender/safeReceiver logic as in messages.service
     const safeSender = messageData?.sender_id?.toString();
     const safeReceiver = senderId?.toString();
+    console.log("Updating 2nd cach");
+    await cacheManagerService.addMessageInRedisWindow({
+      windowId: body.conversation?.toString(),
+      chat: {
+        sender_name: messageData?.sender_name || null,
+        sender_id: messageData?.sender_id,
+        content: messageData?.content || "",
+      },
+    });
     await MessagesServices.updateConversation(
       new mongoose.Types.ObjectId(body?.conversation),
       new mongoose.Types.ObjectId(safeReceiver),
