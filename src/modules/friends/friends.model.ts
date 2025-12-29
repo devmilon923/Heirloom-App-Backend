@@ -12,6 +12,6 @@ const friendSchema = new Schema<TFriends>(
     relation: { type: String, enum: RelationEnum, required: true },
     status: { type: String, enum: RelationStatusEnum, required: true },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 export const Friends = mongoose.model("friends", friendSchema);

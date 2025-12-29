@@ -20,6 +20,6 @@ const assistantChatSchema = new Schema<TAssistantChat>(
       trim: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 export const AssistantChats = model("assistantChats", assistantChatSchema);

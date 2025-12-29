@@ -8,7 +8,7 @@ export const createReportService = async (
   userId: Types.ObjectId,
   suspectId: Types.ObjectId,
   msg: string,
-  msgTitle: string
+  msgTitle: string,
 ) => {
   try {
     const createdSupport = await reportModel.create({
@@ -30,7 +30,7 @@ export const createReportService = async (
 
 export const supportList = async (
   page: number,
-  limit: number
+  limit: number,
 
   //search?: string,
 ) => {
@@ -50,7 +50,7 @@ export const supportList = async (
 };
 export const reportList = async (
   page: number,
-  limit: number
+  limit: number,
 
   //search?: string,
 ) => {

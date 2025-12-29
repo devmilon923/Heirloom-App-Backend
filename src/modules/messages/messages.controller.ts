@@ -58,7 +58,6 @@ const sendMessage = catchAsync(async (req: Request, res: Response) => {
 
   // Save the message using the service layer
   const result: any = await MessagesServices.sendMessage(body);
-
   // Immediately send a success response to the client
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -71,10 +70,9 @@ const sendMessage = catchAsync(async (req: Request, res: Response) => {
   setImmediate(async () => {
     try {
       // Notify conversation participants of the new message via socket
-
       await sendSocketNewMessage({
-        sender_name: result?.message?.receiver?.name || "Unknown",
-        sender: result?.message?.receiver?._id?.toString(),
+        sender_name: result?.message?.sender?.name,
+        sender: result?.message?.sender?._id?.toString(),
         image: result?.message?.image,
         conversation: conversation.toString(),
         messages: messages,
@@ -94,11 +92,15 @@ const sendMessage = catchAsync(async (req: Request, res: Response) => {
           // console.log(receiverId);
           const user =
             await UserModel.findById(receiverId).select("user_mood name");
+          const recentMessage =
+            await cacheManagerService.getUserRedisMessageWindow({
+              windowId: conversation.toString(),
+            });
           const reply = await OpenAIService.genarateAiResponses({
             chatQuery: {
-              $or: [{ senderId: receiverId }, { reciverId: receiverId }],
+              conversationId: conversation.toString(),
             },
-            //TODO: add redis cach message window also
+            recentMessage,
             sender_name: result?.message?.reciver?.name,
             receiver_name: result?.message?.sender?.name,
             journalQuery: { userId: receiverId },

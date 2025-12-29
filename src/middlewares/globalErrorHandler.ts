@@ -97,8 +97,6 @@ const errorTypeMap: Record<number, string> = {
   511: "Network Authentication Required",
 };
 
-
-
 const globalErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
   let errorInfo: IErrorResponse = {
     success: false,

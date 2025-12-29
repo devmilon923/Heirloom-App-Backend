@@ -46,12 +46,12 @@ const addLegacy = catchAsync(async (req: Request, res: Response) => {
     .then((result) => {
       if (result.status === "completed") {
         console.log(
-          `📬 Job ${"jobId" in result ? result.jobId : "N/A"} completed`
+          `📬 Job ${"jobId" in result ? result.jobId : "N/A"} completed`,
         );
       } else {
         console.warn(
           `⚠ Job ${"jobId" in result ? result.jobId : "N/A"} status: ${result.status}`,
-          "error" in result ? result.error : undefined
+          "error" in result ? result.error : undefined,
         );
       }
     })
@@ -101,7 +101,7 @@ const getLegacyById = catchAsync(async (req: Request, res: Response) => {
   const userId = (req.user as IUserPayload).id;
   const result = await LegacyService.getLegacyById(
     new mongoose.Types.ObjectId(req.params?.legacyId),
-    new mongoose.Types.ObjectId(userId)
+    new mongoose.Types.ObjectId(userId),
   );
   let responseData = {
     _id: result?._id,
@@ -121,7 +121,7 @@ const deleteLegacyById = catchAsync(async (req: Request, res: Response) => {
   const userId = (req.user as IUserPayload).id;
   const result = await LegacyService.deleteLegacyById(
     new mongoose.Types.ObjectId(req.params?.legacyId),
-    new mongoose.Types.ObjectId(userId)
+    new mongoose.Types.ObjectId(userId),
   );
   if (!result) {
     throw new ApiError(httpStatus.NOT_FOUND, "Invalid lagacy");
@@ -169,7 +169,7 @@ const getTriggeredLegacyById = catchAsync(
     const userId = (req.user as IUserPayload).id;
     const result = await LegacyService.getTriggeredLegacyById(
       new mongoose.Types.ObjectId(req.params?.legacyId),
-      new mongoose.Types.ObjectId(userId)
+      new mongoose.Types.ObjectId(userId),
     );
     if (!result) {
       throw new ApiError(httpStatus.BAD_REQUEST, "Invalid request");
@@ -188,7 +188,7 @@ const getTriggeredLegacyById = catchAsync(
       message: "Legacy message view successfully!",
       data: responseData,
     });
-  }
+  },
 );
 const getTriggeredLegacy = catchAsync(async (req: Request, res: Response) => {
   //   const { recipients, messages, triggerDate }: TLegacy = req.body;

@@ -8,7 +8,7 @@ export const validateUserLockStatus = async (user: IUser) => {
   } else {
     throw new ApiError(
       httpStatus.BAD_REQUEST,
-      "Your account is temporarily blocked"
+      "Your account is temporarily blocked",
     );
   }
 };

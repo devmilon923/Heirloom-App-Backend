@@ -16,7 +16,7 @@ async function main() {
     // Start the connecting animation
     const loader = setInterval(() => {
       process.stdout.write(
-        `\rMongoDB connecting ${loadingFrames[frameIndex]} Please wait 😢`
+        `\rMongoDB connecting ${loadingFrames[frameIndex]} Please wait 😢`,
       );
       frameIndex = (frameIndex + 1) % loadingFrames.length;
     }, 300); // Update frame every 300ms
@@ -29,7 +29,7 @@ async function main() {
     // Stop the connecting animation
     clearInterval(loader);
     console.log(
-      `\r✅ Mongodb connected successfully in ${Date.now() - dbStartTime}ms`
+      `\r✅ Mongodb connected successfully in ${Date.now() - dbStartTime}ms`,
     );
 
     // Start HTTP server
@@ -38,7 +38,7 @@ async function main() {
     const serverStartTime = Date.now();
     server.listen(PORT, () => {
       console.log(
-        `🚀 Server is running on port ${PORT} and took ${Date.now() - serverStartTime}ms to start`
+        `🚀 Server is running on port ${PORT} and took ${Date.now() - serverStartTime}ms to start`,
       );
     });
 

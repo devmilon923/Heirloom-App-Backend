@@ -13,7 +13,7 @@ const journalSchema = new mongoose.Schema<TJournals>(
     customDate: { type: Date, required: true },
     isDeleted: { type: Boolean, required: true, trim: true, default: false },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export const JournalsDB = mongoose.model("journals", journalSchema);

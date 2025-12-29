@@ -32,6 +32,7 @@ const saveData = async (text: string) => {
     senderId: "senderIdasu4029342n",
     reciverId: "reciverId38792hnd093",
     chat: text,
+    conversationId: "",
     relation: "frined",
   });
   return { journal, chat };

@@ -42,7 +42,7 @@ export const addReport = catchAsync(async (req: Request, res: Response) => {
     new mongoose.Types.ObjectId(userId),
     new mongoose.Types.ObjectId(suspectId),
     msg,
-    msgTitle
+    msgTitle,
   );
 
   // Success response

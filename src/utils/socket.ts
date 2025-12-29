@@ -137,7 +137,6 @@ export const initSocketIO = async (server: HttpServer): Promise<void> => {
           break;
         }
       }
-      console.log(connectedUsers, "===============connected");
     });
   });
 };

@@ -18,8 +18,6 @@ import { verifyToken } from "../../../utils/JwtToken";
 import ApiError from "../../../errors/ApiError";
 import { sanitizeOptions } from "../../../utils/SanitizeOptions";
 
-
-
 export const createTerms = catchAsync(async (req: Request, res: Response) => {
   let decoded;
   try {

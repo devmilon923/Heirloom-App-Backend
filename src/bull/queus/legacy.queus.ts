@@ -53,7 +53,7 @@ const triggerLegacyQueue = async ({
         delay,
         backoff: 5000,
         removeOnComplete: true,
-      }
+      },
     );
 
     return job
@@ -97,7 +97,7 @@ const checkRedisConnection = async () => {
 checkRedisConnection().then((connected) => {
   console.log(connected);
   console.log(
-    `Initial Redis connection: ${connected ? "🟢 SUCCESS" : "🔴 FAILED"}`
+    `Initial Redis connection: ${connected ? "🟢 SUCCESS" : "🔴 FAILED"}`,
   );
 });
 

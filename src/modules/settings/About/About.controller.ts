@@ -17,8 +17,6 @@ import {
 import { verifyToken } from "../../../utils/JwtToken";
 import { sanitizeOptions } from "../../../utils/SanitizeOptions";
 
-
-
 export const createAbout = catchAsync(async (req: Request, res: Response) => {
   let decoded;
   try {

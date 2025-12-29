@@ -71,7 +71,7 @@ const sendAssistantMessage = async (myMessage: string, userId: string) => {
 const getMyAssistantConversations = async (
   userId: string,
   limit: number,
-  skip: number
+  skip: number,
 ) => {
   // Find all assistant chats for the user, sorted by most recent
   const chats = await AssistantChats.find({ user: userId })

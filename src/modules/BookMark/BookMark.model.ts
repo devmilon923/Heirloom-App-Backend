@@ -16,7 +16,7 @@ const BookMarkSchema = new Schema<IBookMark>(
 
     isDeleted: { type: Boolean, default: false },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // Create the model based on the schema

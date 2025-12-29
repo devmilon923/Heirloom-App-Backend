@@ -136,9 +136,9 @@ export const getMyNotification = catchAsync(
     // Mark notifications as read based on role
     await NotificationModel.updateMany(
       { ...query, [readField]: false },
-      { $set: { [readField]: true } }
+      { $set: { [readField]: true } },
     );
-  }
+  },
 );
 
 export const getUnreadBadgeCount = catchAsync(
@@ -241,13 +241,13 @@ export const getUnreadBadgeCount = catchAsync(
         latestNotifications,
       },
     });
-  }
+  },
 );
 
 export const adminSendPushNotification = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { fcmTokens, title, body } = req.body;

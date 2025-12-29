@@ -6,14 +6,13 @@ import { UserServices } from "../modules/user/user.service";
 
 export const checkAIMode = async (
   conversation: Types.ObjectId,
-  userId: Types.ObjectId
+  userId: Types.ObjectId,
 ) => {
   const getConCache = await cacheManagerService.getConversation({
     conversationId: conversation,
   });
   if (getConCache) {
     if (getConCache?.ai_user?.includes(userId?.toString())) {
-      console.log(true, "==================");
       return true;
     }
     console.log("cache block");
@@ -21,7 +20,7 @@ export const checkAIMode = async (
   } else {
     const result = await UserServices.getConversationById(
       new mongoose.Types.ObjectId(userId),
-      conversation
+      conversation,
     );
 
     // console.log(result);

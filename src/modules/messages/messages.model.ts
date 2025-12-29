@@ -44,7 +44,7 @@ const messageSchema = new Schema<TMessages>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const conversationSchema = new Schema<TConversation>(
@@ -67,10 +67,10 @@ const conversationSchema = new Schema<TConversation>(
       trim: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 export const Conversations = mongoose.model(
   "conversations",
-  conversationSchema
+  conversationSchema,
 );
 export const Messages = mongoose.model("messages", messageSchema);

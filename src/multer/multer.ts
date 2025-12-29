@@ -132,7 +132,7 @@ const storage = multer.diskStorage({
   filename: function (
     req: Request,
     file: Express.Multer.File,
-    cb: (error: Error | null, filename: string) => void
+    cb: (error: Error | null, filename: string) => void,
   ) {
     const extName = path.extname(file.originalname);
     const fileName = file.originalname.replace(/\s+/g, "_");
@@ -144,7 +144,7 @@ const storage = multer.diskStorage({
 const fileFilter = (
   req: Request,
   file: Express.Multer.File,
-  cb: FileFilterCallback
+  cb: FileFilterCallback,
 ) => {
   const extName = path.extname(file.originalname).toLocaleLowerCase();
   const isAllowedFileType = ALLOWED_FILE_TYPES.includes(extName);

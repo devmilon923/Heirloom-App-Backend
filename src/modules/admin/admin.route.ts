@@ -27,7 +27,7 @@ router
   .patch(
     guardRole("admin"),
     upload.single("image"),
-    AdminController.updateArtical
+    AdminController.updateArtical,
   );
 
 router.route("/add-faq").post(guardRole("admin"), AdminController.addFaq);

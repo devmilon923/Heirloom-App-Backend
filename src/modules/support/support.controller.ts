@@ -156,7 +156,7 @@ export const deleteSupport = catchAsync(async (req: Request, res: Response) => {
     // });
     throw new ApiError(
       httpStatus.NOT_FOUND,
-      "This support is  already deleted."
+      "This support is  already deleted.",
     );
   }
   await supportDelete(id);

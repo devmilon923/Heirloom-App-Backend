@@ -17,8 +17,6 @@ import { verifyToken } from "../../../utils/JwtToken";
 import ApiError from "../../../errors/ApiError";
 import { sanitizeOptions } from "../../../utils/SanitizeOptions";
 
-
-
 export const createPrivacy = catchAsync(async (req: Request, res: Response) => {
   let decoded;
   try {

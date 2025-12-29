@@ -28,5 +28,5 @@ export const FIREBASE_SERVICE_ACCOUNT_PATH =
   process.env.FIREBASE_SERVICE_ACCOUNT_PATH ||
   path.resolve(
     process.cwd(),
-    "src/config/heirloom-app-523fa-firebase-adminsdk-fbsvc-e722890de5.json"
+    "src/config/heirloom-app-523fa-firebase-adminsdk-fbsvc-e722890de5.json",
   );

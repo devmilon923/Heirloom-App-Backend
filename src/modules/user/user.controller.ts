@@ -57,7 +57,7 @@ export const registerUser = catchAsync(async (req: Request, res: Response) => {
   if (!validUsername) {
     throw new ApiError(
       httpStatus.BAD_REQUEST,
-      "Username should not contain spaces"
+      "Username should not contain spaces",
     );
   }
   // Validate that the role is provided; if not, throw an error.
@@ -111,7 +111,7 @@ export const registerUser = catchAsync(async (req: Request, res: Response) => {
         OTPModel.findOneAndUpdate(
           { email },
           { otp, expiresAt },
-          { upsert: true }
+          { upsert: true },
         ),
         saveOTP(email, otp),
       ]);
@@ -119,7 +119,7 @@ export const registerUser = catchAsync(async (req: Request, res: Response) => {
       // --------> Emit notification <----------------
       // Convert the created user's id to a mongoose ObjectId type.
       const userObjectId = new mongoose.Types.ObjectId(
-        createdUser._id as string
+        createdUser._id as string,
       );
       // Create a payload for notifications with messages for both the user and the admin.
       const notificationPayload: any = {
@@ -173,12 +173,12 @@ export const resendOTP = catchAsync(async (req: Request, res: Response) => {
 
   if (otpRecord && otpRecord.expiresAt > now) {
     const remainingTime = Math.floor(
-      (otpRecord.expiresAt.getTime() - now.getTime()) / 1000
+      (otpRecord.expiresAt.getTime() - now.getTime()) / 1000,
     );
 
     throw new ApiError(
       httpStatus.FORBIDDEN,
-      `You can't request another OTP before ${remainingTime} seconds.`
+      `You can't request another OTP before ${remainingTime} seconds.`,
     );
   }
   sendResponse(res, {
@@ -253,7 +253,7 @@ export const loginUser = catchAsync(async (req: Request, res: Response) => {
   // Verify password
   const isPasswordValid = await argon2.verify(
     user.password as string,
-    password
+    password,
   );
   if (!isPasswordValid) {
     throw new ApiError(401, "Wrong password!");
@@ -311,12 +311,12 @@ export const forgotPassword = catchAsync(
     const otpRecord = await OTPModel.findOne({ email });
     if (otpRecord && otpRecord.expiresAt > now) {
       const remainingTime = Math.floor(
-        (otpRecord.expiresAt.getTime() - now.getTime()) / 1000
+        (otpRecord.expiresAt.getTime() - now.getTime()) / 1000,
       );
 
       throw new ApiError(
         403,
-        `You can't request another OTP before ${remainingTime} seconds.`
+        `You can't request another OTP before ${remainingTime} seconds.`,
       );
     }
     const token = generateRegisterToken({ email });
@@ -330,7 +330,7 @@ export const forgotPassword = catchAsync(
     // await setCache(email, otp, 300);
     await sendResetOTPEmail(email, otp, user.name as string);
     await saveOTP(email, otp); // Save OTP with expiration
-  }
+  },
 );
 
 export const resetPassword = catchAsync(async (req: Request, res: Response) => {
@@ -362,7 +362,7 @@ export const resetPassword = catchAsync(async (req: Request, res: Response) => {
   if (!user) {
     throw new ApiError(
       404,
-      "User not found. Are you attempting something sneaky?"
+      "User not found. Are you attempting something sneaky?",
     );
   }
   const newPassword = await hashPassword(password);
@@ -376,7 +376,7 @@ export const verifyOTP = catchAsync(async (req: Request, res: Response) => {
   try {
     const { token, username, email, phone } = await verifyOTPService(
       otp,
-      req.headers.authorization as string
+      req.headers.authorization as string,
     );
     sendResponse(res, {
       statusCode: httpStatus.CREATED,
@@ -447,7 +447,7 @@ export const updateUser = catchAsync(async (req: Request, res: Response) => {
   } catch (error: any) {
     throw new ApiError(
       error.statusCode || 500,
-      error.message || "Unexpected error occurred while updating user."
+      error.message || "Unexpected error occurred while updating user.",
     );
   }
 });
@@ -488,7 +488,7 @@ export const getSelfInfo = catchAsync(async (req: Request, res: Response) => {
     throw new ApiError(
       error.statusCode || 500,
       error.message ||
-        "Unexpected error occurred while retrieving user information."
+        "Unexpected error occurred while retrieving user information.",
     );
   }
 });
@@ -510,7 +510,7 @@ export const deleteUser = catchAsync(async (req: Request, res: Response) => {
     ) {
       throw new ApiError(
         403,
-        "You cannot delete this account. Please contact support"
+        "You cannot delete this account. Please contact support",
       );
     }
 
@@ -524,7 +524,7 @@ export const deleteUser = catchAsync(async (req: Request, res: Response) => {
   } catch (error: any) {
     throw new ApiError(
       error.statusCode || 500,
-      error.message || "Unexpected error occurred while deleting the user."
+      error.message || "Unexpected error occurred while deleting the user.",
     );
   }
 });
@@ -549,7 +549,7 @@ export const changePassword = catchAsync(
       if (!isMatch) {
         throw new ApiError(
           httpStatus.UNAUTHORIZED,
-          "Old password is incorrect."
+          "Old password is incorrect.",
         );
       }
 
@@ -566,10 +566,10 @@ export const changePassword = catchAsync(
     } catch (error: any) {
       throw new ApiError(
         error.statusCode || 500,
-        error.message || "Failed to change password."
+        error.message || "Failed to change password.",
       );
     }
-  }
+  },
 );
 
 export const adminloginUser = catchAsync(
@@ -589,7 +589,7 @@ export const adminloginUser = catchAsync(
       // Check password validity
       const isPasswordValid = await argon2.verify(
         user.password as string,
-        password
+        password,
       );
       if (!isPasswordValid) {
         throw new ApiError(401, "Wrong password!");
@@ -625,10 +625,10 @@ export const adminloginUser = catchAsync(
     } catch (error: any) {
       throw new ApiError(
         error.statusCode || 500,
-        error.message || "An error occurred during admin login."
+        error.message || "An error occurred during admin login.",
       );
     }
-  }
+  },
 );
 const getMessages = catchAsync(async (req: Request, res: Response) => {
   try {
@@ -644,7 +644,7 @@ const getMessages = catchAsync(async (req: Request, res: Response) => {
       new mongoose.Types.ObjectId(conversationId),
       new mongoose.Types.ObjectId(userId),
       page,
-      limit
+      limit,
     );
     if (!conversation) {
       throw new ApiError(404, "No message found.");
@@ -661,7 +661,7 @@ const getMessages = catchAsync(async (req: Request, res: Response) => {
     throw new ApiError(
       error.statusCode || 500,
       error.message ||
-        "Unexpected error occurred while retrieving user information."
+        "Unexpected error occurred while retrieving user information.",
     );
   }
 });
@@ -679,7 +679,7 @@ const getMedia = catchAsync(async (req: Request, res: Response) => {
       new mongoose.Types.ObjectId(conversationId),
       new mongoose.Types.ObjectId(userId),
       page,
-      limit
+      limit,
     );
     if (!conversation) {
       throw new ApiError(404, "No message found.");
@@ -696,7 +696,7 @@ const getMedia = catchAsync(async (req: Request, res: Response) => {
     throw new ApiError(
       error.statusCode || 500,
       error.message ||
-        "Unexpected error occurred while retrieving user information."
+        "Unexpected error occurred while retrieving user information.",
     );
   }
 });
@@ -713,7 +713,7 @@ const getConversation = catchAsync(async (req: Request, res: Response) => {
       new mongoose.Types.ObjectId(userId),
       page,
       limit,
-      searchQ
+      searchQ,
     );
     if (!conversation) {
       throw new ApiError(404, "No conversation found.");
@@ -730,7 +730,7 @@ const getConversation = catchAsync(async (req: Request, res: Response) => {
     throw new ApiError(
       error.statusCode || 500,
       error.message ||
-        "Unexpected error occurred while retrieving user information."
+        "Unexpected error occurred while retrieving user information.",
     );
   }
 });
@@ -763,7 +763,7 @@ const uploadImage = catchAsync(async (req: Request, res: Response) => {
     throw new ApiError(
       error.statusCode || 500,
       error.message ||
-        "Unexpected error occurred while retrieving user information."
+        "Unexpected error occurred while retrieving user information.",
     );
   }
 });
@@ -802,7 +802,7 @@ export const getAllUsers = catchAsync(async (req: Request, res: Response) => {
       name as string,
       email as string,
       role as string,
-      requestStatus as string
+      requestStatus as string,
     );
 
     // Pagination logic for prevPage and nextPage
@@ -836,7 +836,7 @@ export const getAllUsers = catchAsync(async (req: Request, res: Response) => {
           createdAt: user.createdAt,
           reportCount, // Now the reportCount is resolved and stored directly
         };
-      })
+      }),
     );
 
     // Send response with pagination details
@@ -858,7 +858,7 @@ export const getAllUsers = catchAsync(async (req: Request, res: Response) => {
     // Handle any errors during the user fetching or manager population
     throw new ApiError(
       error.statusCode || 500,
-      error.message || "Failed to retrieve users."
+      error.message || "Failed to retrieve users.",
     );
   }
 });
@@ -889,10 +889,10 @@ const getDashboardOverallStats = catchAsync(
       // Handle any errors during the user fetching or manager population
       throw new ApiError(
         error.statusCode || 500,
-        error.message || "Failed to retrieve users."
+        error.message || "Failed to retrieve users.",
       );
     }
-  }
+  },
 );
 
 export const UserControllers = {

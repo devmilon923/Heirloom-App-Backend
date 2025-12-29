@@ -18,6 +18,6 @@ const articalSchema = new Schema<TArticals>(
     },
     content: { type: String, required: true },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 export const ArticalsModel = model("Articals", articalSchema);

@@ -17,7 +17,7 @@ const triggerlagacyQueue = async (job: Job) => {
     // Add your actual business logic here
     const { recipients, legacyId } = job.data;
     const objectIds = recipients?.map(
-      (id: string) => new mongoose.Types.ObjectId(id)
+      (id: string) => new mongoose.Types.ObjectId(id),
     ); // convert string to ObjectId
 
     const users = await UserModel.find({
@@ -29,7 +29,7 @@ const triggerlagacyQueue = async (job: Job) => {
     // Only fetch the lagacy once
     const lagacy: any = await Legacys.findById(legacyId).populate(
       "user",
-      "name"
+      "name",
     );
 
     // Send push notification first
@@ -76,7 +76,7 @@ ${lagacy?.messages || "No message available."}`,
           });
 
           console.log(
-            `🔄 Rescheduled loop lagacy ${result?._id} for ${nextTriggerDate}`
+            `🔄 Rescheduled loop lagacy ${result?._id} for ${nextTriggerDate}`,
           );
         }
       }

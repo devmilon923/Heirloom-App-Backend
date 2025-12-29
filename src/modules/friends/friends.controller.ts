@@ -25,7 +25,7 @@ const sendRequest = catchAsync(async (req: Request, res: Response) => {
   const result = await FriendServices.sendRequest(
     new Types.ObjectId(userId),
     new Types.ObjectId(reciveBy),
-    relation
+    relation,
   );
   return sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -87,7 +87,7 @@ const getRequest = catchAsync(async (req: Request, res: Response) => {
   if (searchQ?.trim()) {
     const lowerSearch = searchQ?.toLowerCase();
     responseData = responseData?.filter((data) =>
-      data?.name?.toLowerCase()?.includes(lowerSearch)
+      data?.name?.toLowerCase()?.includes(lowerSearch),
     );
   }
 
@@ -114,7 +114,7 @@ const action = catchAsync(async (req: Request, res: Response) => {
   const result = await FriendServices.makeAction(
     new Types.ObjectId(userId),
     new Types.ObjectId(requestId),
-    status
+    status,
   );
   return sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -130,7 +130,6 @@ const unfriendAction = catchAsync(async (req: Request, res: Response) => {
   const result = await FriendServices.unfriendAction(
     new Types.ObjectId(requestId),
     new Types.ObjectId(userId),
-
   );
   return sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -194,7 +193,7 @@ const getList = catchAsync(async (req: Request, res: Response) => {
   if (searchQ?.trim()) {
     const lowerSearch = searchQ?.toLowerCase();
     responseData = responseData?.filter((data) =>
-      data?.name?.toLowerCase()?.includes(lowerSearch)
+      data?.name?.toLowerCase()?.includes(lowerSearch),
     );
   }
 
@@ -248,7 +247,7 @@ const pepoleSearch = catchAsync(async (req: Request, res: Response) => {
   const result = await FriendServices.pepoleSearch(
     { ...query, _id: { $nin: Array.from(excludedUserIds) } },
     page,
-    limit
+    limit,
   );
   console.log(excludedUserIds);
   let responseData =

@@ -447,7 +447,6 @@ const sendMessage = async (body: TMessages) => {
   const populatedResult: any = await Messages.findById(result._id)
     .populate("sender", "name _id") // Populate sender's name
     .populate("reciver", "name _id"); // Populate receiver's name
-  console.log("=============", populatedResult);
   // 5. Perform background tasks (embedding, conversation update, socket emission)
   await cacheManagerService.addMessageInRedisWindow({
     windowId: body.conversation?.toString(),
@@ -465,6 +464,7 @@ const sendMessage = async (body: TMessages) => {
         PineconeCollections.saveChat({
           id: result._id.toString(),
           senderId: sender,
+          conversationId: body.conversation?.toString(),
           reciverId: receiver?._id,
           chat: body.messages,
           relation: relationData?.relation || "",

@@ -10,7 +10,7 @@ import { FIREBASE_SERVICE_ACCOUNT_PATH } from "../../../config";
 // Read and parse the Firebase service account JSON file
 const serviceAccountBuffer = readFileSync(
   FIREBASE_SERVICE_ACCOUNT_PATH,
-  "utf8"
+  "utf8",
 );
 const serviceAccount = JSON.parse(serviceAccountBuffer);
 
@@ -22,7 +22,7 @@ if (!admin.apps.length) {
 
 export const sendPushNotification = async (
   fcmToken: string,
-  payload: INotificationPayload
+  payload: INotificationPayload,
 ): Promise<string> => {
   const message = {
     token: fcmToken,
@@ -45,12 +45,12 @@ export const sendPushNotification = async (
 // Fallback helper for sending notifications to multiple tokens
 export const sendPushNotificationToMultiple = async (
   tokens: string[],
-  payload: INotificationPayload
+  payload: INotificationPayload,
 ): Promise<any> => {
   try {
     // Filter out empty or invalid tokens
     const validTokens = tokens.filter(
-      (token) => typeof token === "string" && token.trim() !== ""
+      (token) => typeof token === "string" && token.trim() !== "",
     );
     if (!validTokens.length) {
       throw new ApiError(400, "No valid FCM tokens provided");

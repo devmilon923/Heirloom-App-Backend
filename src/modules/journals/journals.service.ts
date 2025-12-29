@@ -20,7 +20,7 @@ const addJournals = async (body: TJournals, userId: Types.ObjectId) => {
     chunk.map(async (data, index) => {
       // Add index parameter
       const vector = await OpenAIService.embedding(
-        `journal title: ${body?.title} and journal body: ${data}`
+        `journal title: ${body?.title} and journal body: ${data}`,
       );
 
       await PineconeCollections.saveJournal({
@@ -30,7 +30,7 @@ const addJournals = async (body: TJournals, userId: Types.ObjectId) => {
         userId: userId.toString(),
         id: `${result._id.toString()}-${index}`,
       });
-    })
+    }),
   );
 
   return result;
@@ -64,7 +64,7 @@ const getJournals = async (query: any, page: number, limit: number) => {
 };
 const deleteJournals = async (
   journalid: Types.ObjectId,
-  userId: Types.ObjectId
+  userId: Types.ObjectId,
 ) => {
   const result = await JournalsDB.findOneAndUpdate(
     {
@@ -74,7 +74,7 @@ const deleteJournals = async (
     },
     {
       isDeleted: true,
-    }
+    },
   );
   if (!result) {
     throw new ApiError(httpStatus.NOT_FOUND, "Journal not found.");
@@ -84,7 +84,7 @@ const deleteJournals = async (
 const editJournals = async (
   body: TJournals,
   userId: Types.ObjectId,
-  journalid: Types.ObjectId
+  journalid: Types.ObjectId,
 ) => {
   const result = await JournalsDB.findOneAndUpdate(
     {
@@ -97,7 +97,7 @@ const editJournals = async (
     },
     {
       new: true,
-    }
+    },
   );
   return result;
 };

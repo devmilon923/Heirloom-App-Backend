@@ -10,7 +10,7 @@ const addJournals = catchAsync(async (req: Request, res: Response) => {
   const userId = (req.user as IUserPayload).id;
   const result = await journalServices.addJournals(
     req.body,
-    new mongoose.Types.ObjectId(userId)
+    new mongoose.Types.ObjectId(userId),
   );
   return sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -66,7 +66,7 @@ const deleteJournals = catchAsync(async (req: Request, res: Response) => {
   const journalid = req.params.journalid;
   await journalServices.deleteJournals(
     new mongoose.Types.ObjectId(journalid),
-    new mongoose.Types.ObjectId(userId)
+    new mongoose.Types.ObjectId(userId),
   );
   return sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -81,7 +81,7 @@ const editJournals = catchAsync(async (req: Request, res: Response) => {
   const result = await journalServices.editJournals(
     req.body,
     new mongoose.Types.ObjectId(userId),
-    new mongoose.Types.ObjectId(journalid)
+    new mongoose.Types.ObjectId(journalid),
   );
   const responseData = {
     _id: result?._id,

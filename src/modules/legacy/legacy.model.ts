@@ -20,7 +20,7 @@ const legacySchema = new mongoose.Schema<TLegacy>(
     triggerStatus: { type: Boolean, required: true, default: false },
     type: { type: String, required: true, enum: ["onetime", "loop"] },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 legacySchema.pre("save", function (next) {
   if (this.recipients && this.recipients.length) {

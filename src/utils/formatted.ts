@@ -4,12 +4,12 @@ import { MessagesServices } from "../modules/messages/messages.service";
 
 export const formatConversationData = async (
   conversationId: Types.ObjectId,
-  userId: string
+  userId: string,
 ) => {
   const data: any = await MessagesServices.findConversation(conversationId);
   // console.log(data, "======================");
   const otherParticipant = data?.participants?.find(
-    (participant: any) => participant?._id.toString() !== userId
+    (participant: any) => participant?._id.toString() !== userId,
   );
 
   const sender = data?.lastMessage?.sender?._id || userId;

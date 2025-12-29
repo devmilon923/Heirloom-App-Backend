@@ -11,26 +11,26 @@ router
   .post(
     guardRole("user"),
     upload.single("image"),
-    MessagesController.sendMessage
+    MessagesController.sendMessage,
   );
 router.route("/aimode").post(guardRole("user"), MessagesController.aimode);
 router.get("/:conversationId", guardRole("user"), UserControllers.getMessages);
 router.get(
   "/media/:conversationId",
   guardRole("user"),
-  UserControllers.getMedia
+  UserControllers.getMedia,
 );
 router.get(
   "/get/conversations",
   guardRole("user"),
-  UserControllers.getConversation
+  UserControllers.getConversation,
 );
 
 router.post(
   "/upload/image",
   guardRole("user"),
   upload.single("image"),
-  UserControllers.uploadImage
+  UserControllers.uploadImage,
 );
 
 router.get("/inbox/stacks", guardRole("user"), MessagesController.messageStack);

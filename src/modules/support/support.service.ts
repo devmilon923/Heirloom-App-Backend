@@ -7,7 +7,7 @@ export const createSupportService = async (
   name: string | undefined,
   email: string,
   msg: string,
-  msgTitle: string
+  msgTitle: string,
 ) => {
   try {
     const createdSupport = await supportModel.create({
@@ -29,7 +29,7 @@ export const createSupportService = async (
 
 export const supportList = async (
   page: number,
-  limit: number
+  limit: number,
 
   //search?: string,
 ) => {

@@ -15,7 +15,7 @@ const updateStatus = async (userId: Types.ObjectId, days: number) => {
     {
       lockUntil: days ? extendDays : null,
     },
-    { new: true }
+    { new: true },
   ).select("lockUntil");
 
   return user;
@@ -23,7 +23,7 @@ const updateStatus = async (userId: Types.ObjectId, days: number) => {
 const getUsers = async (query: object) => {
   console.log(query);
   const clients = await UserModel.find(query).select(
-    "frist_name last_name email phone city"
+    "frist_name last_name email phone city",
   );
   return clients;
 };
@@ -34,7 +34,7 @@ function getCurrentWeekDates() {
 
   // Convert current date to Bangladesh Standard Time (UTC+6)
   const bangladeshTime = new Date(
-    currentDate.toLocaleString("en-US", { timeZone: "Asia/Dhaka" })
+    currentDate.toLocaleString("en-US", { timeZone: "Asia/Dhaka" }),
   );
 
   // Set the start of the week (Sunday) at midnight in BST
@@ -63,7 +63,7 @@ const createArtical = async (body: Object, file: any) => {
 const updateArtical = async (
   body: Object,
   file: any,
-  articalId: Types.ObjectId
+  articalId: Types.ObjectId,
 ) => {
   let query = {};
   if (file) {
@@ -101,7 +101,7 @@ const changeRole = async ({ role, filter }: { role: string; filter: any }) => {
     { role: role },
     {
       new: true,
-    }
+    },
   );
   return result;
 };

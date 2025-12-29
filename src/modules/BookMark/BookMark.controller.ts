@@ -32,7 +32,7 @@ export const createBookMarkController = catchAsync(
         user?.role !== "admin"
       ) {
         throw new Error(
-          "Guest user is not allowed to save articals in bookmark"
+          "Guest user is not allowed to save articals in bookmark",
         );
       }
       // Check if a bookmark already exists for this user and event.
@@ -41,7 +41,7 @@ export const createBookMarkController = catchAsync(
       // If bookmark doesn't exist, create a new one.
       const savedBookMark = await createBookMarkService(
         new mongoose.Types.ObjectId(userId),
-        new mongoose.Types.ObjectId(articalsId)
+        new mongoose.Types.ObjectId(articalsId),
       );
 
       return sendResponse(res, {
@@ -54,10 +54,10 @@ export const createBookMarkController = catchAsync(
       throw new ApiError(
         error.statusCode || httpStatus.INTERNAL_SERVER_ERROR,
         error.message ||
-          "Unexpected error occurred while adding event on bookmark"
+          "Unexpected error occurred while adding event on bookmark",
       );
     }
-  }
+  },
 );
 export const removeBookMarkController = catchAsync(
   async (req: Request, res: Response) => {
@@ -80,7 +80,7 @@ export const removeBookMarkController = catchAsync(
         user?.role !== "admin"
       ) {
         throw new Error(
-          "Guest user is not allowed to save articals in bookmark"
+          "Guest user is not allowed to save articals in bookmark",
         );
       }
       // Check if a bookmark already exists for this user and event.
@@ -96,10 +96,10 @@ export const removeBookMarkController = catchAsync(
       throw new ApiError(
         error.statusCode || httpStatus.INTERNAL_SERVER_ERROR,
         error.message ||
-          "Unexpected error occurred while adding event on bookmark"
+          "Unexpected error occurred while adding event on bookmark",
       );
     }
-  }
+  },
 );
 export const getBookMarkController = catchAsync(
   async (req: Request, res: Response) => {
@@ -120,7 +120,7 @@ export const getBookMarkController = catchAsync(
     const result = await getBookMarkList(
       new mongoose.Types.ObjectId(userId),
       page,
-      limit
+      limit,
     );
     // Assuming result has the shape: { data: bookmarks, pagination: { totalPage, currentPage, prevPage, nextPage, limit, totalItem } }
     const bookmarks = result.data;
@@ -145,5 +145,5 @@ export const getBookMarkController = catchAsync(
       data: result,
       // pagination,
     });
-  }
+  },
 );

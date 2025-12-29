@@ -1,9 +1,9 @@
 import BookMark from "./BookMark.model";
-import mongoose, {  Types } from "mongoose";
+import mongoose, { Types } from "mongoose";
 
 export const createBookMarkService = async (
   userId: Types.ObjectId,
-  articalsId: Types.ObjectId
+  articalsId: Types.ObjectId,
 ) => {
   console.log(userId, articalsId);
   // Validate required fields.
@@ -17,7 +17,7 @@ export const createBookMarkService = async (
       userId: userId,
     },
     { articalsId: articalsId, userId: userId },
-    { new: true, upsert: true }
+    { new: true, upsert: true },
   );
 
   return bookmark;
@@ -26,7 +26,7 @@ export const createBookMarkService = async (
 export const getBookMarkList = async (
   userId: Types.ObjectId,
   page: number,
-  limit: number
+  limit: number,
 ) => {
   const skip = (page - 1) * limit;
 

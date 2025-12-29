@@ -38,7 +38,7 @@ const getMyAssistantConversations = catchAsync(
     const data = await AssistantChatServices.getMyAssistantConversations(
       userId,
       limit,
-      skip
+      skip,
     );
     const totalData = await AssistantChats.countDocuments({ user: userId });
     const pagination = paginationBuilder({
@@ -53,7 +53,7 @@ const getMyAssistantConversations = catchAsync(
       message: "Assistant conversations fetched successfully!",
       data: { chat: data?.reverse(), pagination },
     });
-  }
+  },
 );
 
 export const AssistantChatControllers = {

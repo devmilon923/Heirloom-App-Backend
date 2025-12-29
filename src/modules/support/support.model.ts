@@ -10,7 +10,7 @@ const supportSchema = new Schema<ISupport>(
     msg: { type: String, required: true },
     isDeleted: { type: Boolean, default: false },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // Create the RegisterShower model

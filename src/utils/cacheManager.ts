@@ -57,14 +57,14 @@ const addMessageInRedisWindow = async ({
             currentWindow = parsed;
           } else {
             logger.warn(
-              `Redis key ${windowId} contained non-array value, resetting window.`
+              `Redis key ${windowId} contained non-array value, resetting window.`,
             );
             currentWindow = [];
           }
         } catch (err) {
           logger.warn(
             `Failed to parse redis key ${windowId}, resetting window.`,
-            err
+            err,
           );
           currentWindow = [];
         }
@@ -72,13 +72,13 @@ const addMessageInRedisWindow = async ({
         currentWindow = raw;
       } else {
         logger.warn(
-          `Redis key ${windowId} contained non-array value, resetting window.`
+          `Redis key ${windowId} contained non-array value, resetting window.`,
         );
         currentWindow = [];
       }
     }
 
-    currentWindow.push(chat);
+    currentWindow.push({ ...chat, time: new Date() });
     if (currentWindow.length > 20) {
       currentWindow.shift(); // Remove oldest
     }
@@ -87,11 +87,57 @@ const addMessageInRedisWindow = async ({
     logger.error(`addMessageInRedisWindow failed for window ${windowId}`, err);
   }
 };
-const getUserRedisMessageWindow = async ({}) => {};
+const getUserRedisMessageWindow = async ({
+  windowId,
+}: {
+  windowId: string;
+}) => {
+  const raw = await redisClient.get(windowId);
+  let currentWindow: any[] = [];
+  if (raw) {
+    if (typeof raw === "string") {
+      try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          currentWindow = parsed;
+        } else {
+          logger.warn(
+            `Redis key ${windowId} contained non-array value, resetting window.`,
+          );
+          currentWindow = [];
+        }
+      } catch (err) {
+        logger.warn(
+          `Failed to parse redis key ${windowId}, resetting window.`,
+          err,
+        );
+        currentWindow = [];
+      }
+    } else if (Array.isArray(raw)) {
+      currentWindow = raw;
+    } else {
+      logger.warn(
+        `Redis key ${windowId} contained non-array value, resetting window.`,
+      );
+      currentWindow = [];
+    }
+  }
+  return currentWindow?.map(
+    (chat: {
+      sender_name: string;
+      sender_id: string;
+      content: string;
+      time?: Date;
+    }) => {
+      return { [chat.sender_name]: chat.content || "", time: chat?.time };
+    },
+  );
+};
 export const cacheManagerService = {
   setLogUser,
   getLogUser,
   setConversation,
   getConversation,
   addMessageInRedisWindow,
+  getUserRedisMessageWindow,
 };

@@ -15,7 +15,7 @@ const reportSchema = new Schema<IReport>(
     isDeleted: { type: Boolean, default: false },
     isReplyed: { type: Boolean, default: false },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // Create the RegisterShower model

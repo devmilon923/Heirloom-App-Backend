@@ -12,7 +12,7 @@ const redisClient = new Redis({
   retryStrategy: (attempt) => {
     const delay = Math.min(attempt * 50, 2000); // Exponential backoff: 50ms, 100ms, ..., up to 2000ms
     logger.warn(
-      `Redis retry attempt ${attempt}. Reconnecting in ${delay}ms...`
+      `Redis retry attempt ${attempt}. Reconnecting in ${delay}ms...`,
     );
     return delay;
   },
@@ -38,7 +38,7 @@ redisClient.on("close", () => {
 
 redisClient.on("reconnecting", (delay: any, attempt: any) => {
   logger.info(
-    `🔄 Reconnecting to Redis (Attempt ${attempt}, next retry in ${delay}ms)...`
+    `🔄 Reconnecting to Redis (Attempt ${attempt}, next retry in ${delay}ms)...`,
   );
 });
 export const connectRedis = (): Promise<void> => {

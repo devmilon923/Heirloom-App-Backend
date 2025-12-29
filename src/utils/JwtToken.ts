@@ -44,7 +44,7 @@ export function generateToken({
     JWT_SECRET_KEY as string,
     {
       expiresIn: "7d",
-    }
+    },
   );
 }
 export function verifySocketToken(token: string) {
@@ -56,7 +56,7 @@ export function verifySocketToken(token: string) {
   }
 }
 export const verifyToken = (
-  authHeader: string | undefined
+  authHeader: string | undefined,
 ): { id?: string; email?: string } => {
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     const errorMessage = "No token provided or invalid format.";

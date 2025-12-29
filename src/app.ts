@@ -24,7 +24,7 @@ app.use(
   cors({
     origin: "*",
     credentials: true,
-  })
+  }),
 );
 
 app.use(express.static("public"));

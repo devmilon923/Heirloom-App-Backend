@@ -33,7 +33,7 @@ router.patch(
   "/profile-update",
   guardRole(["admin", "user"]),
   upload.single("image"),
-  updateUser
+  updateUser,
 );
 
 router.get("/my-profile", guardRole(["admin", "user"]), getSelfInfo);
@@ -47,7 +47,7 @@ router.get("/user-list", guardRole("admin"), getAllUsers);
 router.get(
   "/dashboard-overall-stats",
   guardRole("admin"),
-  UserControllers.getDashboardOverallStats
+  UserControllers.getDashboardOverallStats,
 );
 
 export const UserRoutes = router;

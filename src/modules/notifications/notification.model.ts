@@ -16,7 +16,7 @@ const NotificationSchema: Schema = new Schema(
     isAdminRead: { type: Boolean, default: false },
     unreadCount: { type: Number, required: true, default: 0 },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export const NotificationModel =

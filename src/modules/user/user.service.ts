@@ -18,7 +18,7 @@ import { Conversations } from "../messages/messages.model";
 export const registerUserService = async (
   name: string,
   email: string,
-  password: string
+  password: string,
 ) => {
   const start = Date.now();
 
@@ -32,7 +32,7 @@ export const registerUserService = async (
   if (isUserRegistered) {
     throw new ApiError(
       httpStatus.CONFLICT,
-      "This account is already registered. Please log in or use a different account."
+      "This account is already registered. Please log in or use a different account.",
     );
   }
 
@@ -40,11 +40,11 @@ export const registerUserService = async (
   const now = new Date();
   if (otpRecord && otpRecord.expiresAt > now) {
     const remainingTime = Math.floor(
-      (otpRecord.expiresAt.getTime() - now.getTime()) / 1000
+      (otpRecord.expiresAt.getTime() - now.getTime()) / 1000,
     );
     throw new ApiError(
       httpStatus.TOO_MANY_REQUESTS,
-      `Please wait ${remainingTime} seconds before requesting a new OTP.`
+      `Please wait ${remainingTime} seconds before requesting a new OTP.`,
     );
   }
 
@@ -91,7 +91,7 @@ export const createUser = async ({
 };
 export const updateUserById = async (
   id: string,
-  updateData: Partial<IUser>
+  updateData: Partial<IUser>,
 ): Promise<IUser | null> => {
   if (updateData?.name && updateData?.ageRange && updateData?.address) {
     return UserModel.findByIdAndUpdate(
@@ -101,7 +101,7 @@ export const updateUserById = async (
         new: true,
 
         runValidators: true,
-      }
+      },
     );
   } else {
     return UserModel.findByIdAndUpdate(id, updateData, {
@@ -132,7 +132,7 @@ export const userDelete = async (id: string, email: string): Promise<void> => {
 };
 export const verifyForgotPasswordOTPService = async (
   email: string,
-  otp: string
+  otp: string,
 ) => {
   const user = await findUserByEmail(email);
   if (!user) {
@@ -170,7 +170,7 @@ export const verifyForgotPasswordOTPService = async (
 export const getAdminList = async (
   skip: number,
   limit: number,
-  name?: string
+  name?: string,
 ): Promise<{ admins: IUser[]; totalAdmins: number; totalPages: number }> => {
   // Initialize the base query to fetch only admin users
   const query: any = {
@@ -234,7 +234,7 @@ export const getUserList = async (
   name?: string,
   email?: string,
   role?: string,
-  requestStatus?: string
+  requestStatus?: string,
 ): Promise<{ users: IUser[]; totalUsers: number; totalPages: number }> => {
   const query: any = {
     isDeleted: { $ne: true },
@@ -286,7 +286,7 @@ export const getUserList = async (
 
 export const verifyOTPService = async (
   otp: string,
-  authorizationHeader: string
+  authorizationHeader: string,
 ) => {
   let decoded;
   try {
@@ -335,7 +335,7 @@ export const verifyOTPService = async (
 };
 const getConversationById = async (
   userId: Types.ObjectId,
-  conversationId: Types.ObjectId
+  conversationId: Types.ObjectId,
 ) => {
   const query: any = {
     participants: { $in: userId },
@@ -348,7 +348,7 @@ const getConversationById = async (
     // Handle any errors during the user fetching or manager population
     throw new ApiError(
       error.statusCode || 500,
-      error.message || "Failed to retrieve users."
+      error.message || "Failed to retrieve users.",
     );
   }
 };

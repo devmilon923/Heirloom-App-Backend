@@ -16,7 +16,7 @@ export function chunkText(text: string, chunkSize: number = 300) {
 export const sendOTPEmailRegister = async (
   name: string,
   email: string,
-  otp: string
+  otp: string,
 ): Promise<void> => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -151,7 +151,7 @@ export const sendReportReply = async ({
 export const sendOTPEmailVerification = async (
   name: string,
   email: string,
-  otp: string
+  otp: string,
 ): Promise<void> => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -204,7 +204,7 @@ export const getStoredOTP = async (email: string): Promise<string | null> => {
 };
 export const sendOTPEmail = async (
   email: string,
-  otp: string
+  otp: string,
 ): Promise<void> => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -255,7 +255,7 @@ export const sendOTPEmail = async (
 
 export const resendOTPEmail = async (
   email: string,
-  otp: string
+  otp: string,
   // name: string,
 ): Promise<void> => {
   try {
@@ -316,7 +316,7 @@ export const resendOTPEmail = async (
 export const sendResetOTPEmail = async (
   email: string,
   otp: string,
-  name: string
+  name: string,
 ): Promise<void> => {
   try {
     const transporter = nodemailer.createTransport({
@@ -369,7 +369,7 @@ export const sendResetOTPEmail = async (
 export const sendManagerRequest = async (
   emails: string | string[],
   name: string,
-  email: string
+  email: string,
 ): Promise<void> => {
   try {
     const transporter = nodemailer.createTransport({
@@ -419,14 +419,14 @@ export const sendManagerRequest = async (
     console.error(`Error sending manager request email to ${emails}:`, error);
     throw new ApiError(
       500,
-      "Unexpected error occurred during sending manager request email."
+      "Unexpected error occurred during sending manager request email.",
     );
   }
 };
 
 export const verifyPassword = async (
   inputPassword: string,
-  storedPassword: string
+  storedPassword: string,
 ): Promise<boolean> => {
   try {
     return await argon2.verify(storedPassword, inputPassword);
@@ -455,7 +455,7 @@ export const saveOTP = async (email: string, otp: string): Promise<void> => {
   await OTPModel.findOneAndUpdate(
     { email },
     { otp, expiresAt: new Date(Date.now() + 3 * 60 * 1000) },
-    { upsert: true, new: true }
+    { upsert: true, new: true },
   );
 };
 

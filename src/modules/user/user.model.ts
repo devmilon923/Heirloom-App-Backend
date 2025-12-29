@@ -94,7 +94,7 @@ const UserSchema = new Schema<IUser>(
       default: false,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export const UserModel =

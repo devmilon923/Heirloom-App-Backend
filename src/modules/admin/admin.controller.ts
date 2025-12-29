@@ -14,12 +14,12 @@ const changeUserStatus = catchAsync(async (req: Request, res: Response) => {
   if (!days)
     throw new ApiError(
       httpStatus.BAD_REQUEST,
-      "Days is required if you want to suspend anyone!"
+      "Days is required if you want to suspend anyone!",
     );
 
   const updateStatus = await AdminService.updateStatus(
     new Types.ObjectId(req.params?.userId),
-    Number(days)
+    Number(days),
   );
 
   return sendResponse(res, {
@@ -106,7 +106,7 @@ const updateArtical = catchAsync(async (req: Request, res: Response) => {
   const result = await AdminService.updateArtical(
     req.body,
     req.file,
-    new mongoose.Types.ObjectId(req.params.articalId)
+    new mongoose.Types.ObjectId(req.params.articalId),
   );
   if (!result) throw new ApiError(httpStatus.BAD_REQUEST, "Invalid submission");
   return sendResponse(res, {
@@ -128,7 +128,7 @@ const addFaq = catchAsync(async (req: Request, res: Response) => {
 const updateFAQ = catchAsync(async (req: Request, res: Response) => {
   const result = await AdminService.updateFAQ(
     req.body,
-    new mongoose.Types.ObjectId(req.params.faqId)
+    new mongoose.Types.ObjectId(req.params.faqId),
   );
   if (!result) throw new ApiError(httpStatus.BAD_REQUEST, "Invalid submission");
   return sendResponse(res, {

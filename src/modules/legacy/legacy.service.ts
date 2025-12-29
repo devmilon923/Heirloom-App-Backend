@@ -47,7 +47,7 @@ const getLegacy = async (query: object, page: number, limit: number) => {
 };
 const getLegacyById = async (
   legacyId: Types.ObjectId,
-  userId: Types.ObjectId
+  userId: Types.ObjectId,
 ) => {
   const result = await Legacys.findOne({
     _id: legacyId,
@@ -60,7 +60,7 @@ const getLegacyById = async (
 };
 const deleteLegacyById = async (
   legacyId: Types.ObjectId,
-  userId: Types.ObjectId
+  userId: Types.ObjectId,
 ) => {
   const result = await Legacys.findOneAndUpdate(
     {
@@ -70,7 +70,7 @@ const deleteLegacyById = async (
     },
     {
       isDeleted: true,
-    }
+    },
   )
     .populate("recipients", "name")
     .populate("user", "name");
@@ -104,7 +104,7 @@ const editLegacyById = async ({
     {
       new: true,
       runValidators: true,
-    }
+    },
   )
     .populate("recipients", "name")
     .populate("user", "name");
@@ -112,7 +112,7 @@ const editLegacyById = async ({
 };
 const getTriggeredLegacyById = async (
   legacyId: Types.ObjectId,
-  userId: Types.ObjectId
+  userId: Types.ObjectId,
 ) => {
   const result = await Legacys.findOne({
     _id: legacyId,
