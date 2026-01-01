@@ -1,9 +1,11 @@
 // // cacheManager.ts
 // import NodeCache from 'node-cache';
 
-import { Types } from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { logger } from "../logger/logger";
 import redisClient from "./Redis";
+import { OpenAIService } from "./openAI";
+import { PineconeCollections } from "../DB/pinecone";
 const setLogUser = async (data: any) => {
   redisClient.set("user", data);
 };
@@ -43,6 +45,7 @@ const addMessageInRedisWindow = async ({
     sender_name: string;
     sender_id: string;
     content: string;
+    relation: string;
   };
 }) => {
   try {
@@ -57,14 +60,14 @@ const addMessageInRedisWindow = async ({
             currentWindow = parsed;
           } else {
             logger.warn(
-              `Redis key ${windowId} contained non-array value, resetting window.`,
+              `Redis key ${windowId} contained non-array value, resetting window.`
             );
             currentWindow = [];
           }
         } catch (err) {
           logger.warn(
             `Failed to parse redis key ${windowId}, resetting window.`,
-            err,
+            err
           );
           currentWindow = [];
         }
@@ -72,15 +75,15 @@ const addMessageInRedisWindow = async ({
         currentWindow = raw;
       } else {
         logger.warn(
-          `Redis key ${windowId} contained non-array value, resetting window.`,
+          `Redis key ${windowId} contained non-array value, resetting window.`
         );
         currentWindow = [];
       }
     }
 
     currentWindow.push({ ...chat, time: new Date() });
-    if (currentWindow.length > 20) {
-      currentWindow.shift(); // Remove oldest
+    if (currentWindow.length > 15) {
+      currentWindow.shift();
     }
     await redisClient.set(windowId, JSON.stringify(currentWindow));
   } catch (err) {
@@ -102,14 +105,14 @@ const getUserRedisMessageWindow = async ({
           currentWindow = parsed;
         } else {
           logger.warn(
-            `Redis key ${windowId} contained non-array value, resetting window.`,
+            `Redis key ${windowId} contained non-array value, resetting window.`
           );
           currentWindow = [];
         }
       } catch (err) {
         logger.warn(
           `Failed to parse redis key ${windowId}, resetting window.`,
-          err,
+          err
         );
         currentWindow = [];
       }
@@ -117,7 +120,7 @@ const getUserRedisMessageWindow = async ({
       currentWindow = raw;
     } else {
       logger.warn(
-        `Redis key ${windowId} contained non-array value, resetting window.`,
+        `Redis key ${windowId} contained non-array value, resetting window.`
       );
       currentWindow = [];
     }
@@ -130,7 +133,7 @@ const getUserRedisMessageWindow = async ({
       time?: Date;
     }) => {
       return { [chat.sender_name]: chat.content || "", time: chat?.time };
-    },
+    }
   );
 };
 export const cacheManagerService = {

@@ -19,39 +19,7 @@ const enhanceJournal = async (content: string) => {
 
   return { reply: fullResponse };
 };
-const saveData = async (text: string) => {
-  const vector = await OpenAIService.embedding(text);
-  const journal = await PineconeCollections.saveJournal({
-    vector: vector,
-    text: text,
-    title: "Dummy title",
-    userId: "userId9384j9034",
-  });
-  const chat = await PineconeCollections.saveChat({
-    vector,
-    senderId: "senderIdasu4029342n",
-    reciverId: "reciverId38792hnd093",
-    chat: text,
-    conversationId: "",
-    relation: "frined",
-  });
-  return { journal, chat };
-};
-const searchData = async (text: string) => {
-  const vector = await OpenAIService.embedding(text);
-  const results = await PineconeCollections.chatCollection.query({
-    vector,
-    topK: 3,
-    includeMetadata: true,
-  });
-  const context = results?.matches?.map((res) => {
-    return `title: ${res?.metadata?.title} and content is: ${res?.metadata?.content}`;
-  });
-  const response = await OpenAIService.chatWithAI(context, text);
-  return response;
-};
+
 export const EnhanceWithAI = {
   enhanceJournal,
-  saveData,
-  searchData,
 };

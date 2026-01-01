@@ -13,22 +13,5 @@ const enhanceJournal = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
-const saveData = catchAsync(async (req: Request, res: Response) => {
-  const result = await EnhanceWithAI.saveData(req.body.content);
-  return sendResponse(res, {
-    statusCode: httpStatus.CREATED,
-    success: true,
-    message: "create embeddings success",
-    data: result,
-  });
-});
-const searchData = catchAsync(async (req: Request, res: Response) => {
-  const result = await EnhanceWithAI.searchData(req.body.content);
-  return sendResponse(res, {
-    statusCode: httpStatus.CREATED,
-    success: true,
-    message: "search embeddings success",
-    data: result,
-  });
-});
-export const EnhanceWithAIController = { enhanceJournal, saveData, searchData };
+
+export const EnhanceWithAIController = { enhanceJournal };

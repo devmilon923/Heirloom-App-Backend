@@ -182,16 +182,21 @@ function emitToBothParties(
     // Use the same safeSender/safeReceiver logic as in messages.service
     const safeSender = messageData?.sender_id?.toString();
     const safeReceiver = senderId?.toString();
-    console.log("Updating 2nd cach");
-    await cacheManagerService.addMessageInRedisWindow({
+     cacheManagerService.addMessageInRedisWindow({
       windowId: body.conversation?.toString(),
       chat: {
         sender_name: messageData?.sender_name || null,
         sender_id: messageData?.sender_id,
         content: messageData?.content || "",
+        relation: result?.relationData?.relation || "Unknown",
       },
     });
-    await MessagesServices.updateConversation(
+     OpenAIService.updateChat({
+      userId: messageData?.sender_id,
+      conversationId: body.conversation?.toString(),
+      relation: result?.relationData?.relation || "Unknown",
+    });
+     MessagesServices.updateConversation(
       new mongoose.Types.ObjectId(body?.conversation),
       new mongoose.Types.ObjectId(safeReceiver),
       new mongoose.Types.ObjectId(safeSender),

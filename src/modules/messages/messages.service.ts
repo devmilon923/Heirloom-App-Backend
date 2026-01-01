@@ -454,23 +454,12 @@ const sendMessage = async (body: TMessages) => {
       sender_name: populatedResult?.sender?.name || null,
       sender_id: sender,
       content: body.messages || "",
+      relation: relationData?.relation || "",
     },
   });
   setImmediate(async () => {
     try {
       // A. If message is text, generate embedding and save to Pinecone
-      if (body.messages) {
-        const vector = await OpenAIService.embedding(body.messages);
-        PineconeCollections.saveChat({
-          id: result._id.toString(),
-          senderId: sender,
-          conversationId: body.conversation?.toString(),
-          reciverId: receiver?._id,
-          chat: body.messages,
-          relation: relationData?.relation || "",
-          vector,
-        });
-      }
 
       // B. Update conversation metadata and create conversation if needed
       await Promise.all([

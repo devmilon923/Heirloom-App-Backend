@@ -15,7 +15,6 @@ type ChatData = {
   vector: number[];
   senderId: string;
   conversationId: string;
-  reciverId: string;
   chat: string | "";
   relation: string;
   id?: string;
@@ -24,7 +23,6 @@ const saveChat = async ({
   vector,
   senderId,
   conversationId,
-  reciverId,
   chat,
   relation,
   id,
@@ -35,7 +33,6 @@ const saveChat = async ({
       values: vector,
       metadata: {
         senderId: senderId?.toString(), // ensure string
-        reciverId: reciverId?.toString(), // ensure string
         chat: chat,
         conversationId,
         relation: relation,

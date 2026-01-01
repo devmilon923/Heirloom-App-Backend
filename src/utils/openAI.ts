@@ -2,6 +2,9 @@ import OpenAI from "openai";
 import { TModes } from "../modules/user/user.interface";
 import { TRelation } from "../modules/friends/friends.interface";
 import { PineconeCollections } from "../DB/pinecone";
+import redisClient from "./Redis";
+import { logger } from "../logger/logger";
+import mongoose from "mongoose";
 
 const openai = new OpenAI({
   apiKey: process.env.GPT_KEY,
@@ -115,7 +118,7 @@ Output rules (strict):
       },
       {
         role: "user",
-        content: `Recent messages (use first): ${JSON.stringify(recentMessage, null, 2)}\n\nRelevant older chat: ${JSON.stringify(chatContext)}\n\nJournal context: ${JSON.stringify(journalContext, null, 2)}\n\nCurrent message: ${textPrompt}\n\nTask: Produce a single, concise, human-sounding reply that uses recent messages first, then older chat, then journal as needed. Ask one clarifying question only if necessary.`,
+        content: `Recent messages (use first): ${JSON.stringify(recentMessage, null, 2)}\n\nRelevant older chat: ${JSON.stringify(chatContext)}\n\nJournal context: ${JSON.stringify(journalContext, null, 2)}\n\nCurrent message: ${textPrompt}\n\nTask: Produce a single, concise, human-sounding reply that uses recent messages first, then older chat, then journal as needed. Ask a clarifying question only if it’s necessary; otherwise, don’t ask any questions.`,
       },
     ],
   });
@@ -195,10 +198,120 @@ Actively ignore or filter out irrelevant or unhelpful chat messages—only use c
 
   return response; // This is a stream (AsyncIterable)
 };
+
+const chatBehavior = async (
+  chats: {
+    sender_name: string;
+    content: string;
+    time: Date;
+    sender_id: string;
+  }[]
+) => {
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+      {
+        role: "system",
+        content: `You are an analyzer that MUST return exactly one valid JSON object and nothing else. Do NOT include any explanation, markdown, or extra text. The JSON must be parseable by JSON.parse. Use the following schema exactly:
+
+{
+  "isCompleted": boolean,
+  "summarise": [
+    { "id": "sender_id", "content": "summary text" },
+    { "id": "sender_id", "content": "summary text" }
+  ]
+}
+
+Strict rules (apply ONLY for this chatBehavior function):
+- Sort chats by their 'time' value in ascending order before analysis.
+- Determine 'isCompleted' using context-aware pattern recognition. Analyze the last 2-4 messages (not just the final one) using these key principles:
+  * Pattern Recognition Over Phrase Matching: Look for linguistic patterns indicating natural conclusion, not specific keywords.
+  * Response Necessity: Set 'isCompleted' to true only if no further response is logically required or expected.
+  * Conversational Momentum: Detect if the conversation is naturally winding down with reduced engagement or clear resolution.
+  * Topic Lifecycle: Recognize when all relevant topics are fully addressed, plans are confirmed, or decisions are finalized.
+  * Examples of completion: "Great, I'll implement that tomorrow" (commitment made, no response needed), "Thanks for explaining, it makes sense now" (understanding confirmed), "See you at 3pm at the usual place" (plan confirmed, conversation complete).
+  * Otherwise, set 'isCompleted' to false.
+- For 'summarise', produce an array of objects. Each object contains 'id' (the sender_id) and 'content' (one concise 1-3 sentence chronological summary capturing that sender's contributions, decisions, and actions).
+- Do NOT include the sender's own name inside that sender's summary. Instead, write that sender's summary from the sender's perspective using first-person pronouns (I, me, my, we, etc.). It is acceptable to refer to other participants by name or neutral descriptors.
+- Do not add any additional keys, metadata, or surrounding text.
+- If a field cannot be determined, use 'false' for booleans and an empty array for summarise.
+`,
+      },
+      {
+        role: "user",
+        content: `Analyze the following chats and return ONLY the JSON object described in the system prompt. Do NOT include any other text. Chats: ${JSON.stringify(chats)}`,
+      },
+    ],
+  });
+
+  return response?.choices[0]?.message?.content;
+};
+const updateChat = async ({
+  conversationId,
+  userId,
+  relation,
+}: {
+  conversationId: string;
+  userId: string;
+  relation: string;
+}) => {
+  const raw = await redisClient.get(conversationId);
+  let currentWindow: any[] = [];
+
+  if (raw) {
+    if (typeof raw === "string") {
+      try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          currentWindow = parsed;
+        } else {
+          logger.warn(
+            `Redis key ${conversationId} contained non-array value, resetting window.`
+          );
+          currentWindow = [];
+        }
+      } catch (err) {
+        logger.warn(
+          `Failed to parse redis key ${conversationId}, resetting window.`,
+          err
+        );
+        currentWindow = [];
+      }
+    } else if (Array.isArray(raw)) {
+      currentWindow = raw;
+    } else {
+      logger.warn(
+        `Redis key ${conversationId} contained non-array value, resetting window.`
+      );
+      currentWindow = [];
+    }
+  }
+  if (currentWindow.length >= 15) {
+    const summariesString: any = await chatBehavior(currentWindow);
+    const summaries = JSON.parse(summariesString);
+    console.log("Is chat complete:" + summaries?.isCompleted);
+    if (summaries?.isCompleted === true) {
+      let userData = summaries?.summarise.find(
+        (user: any) => user?.id === userId?.toString()
+      );
+      const vector = await embedding(userData?.content || "");
+      PineconeCollections.saveChat({
+        id: new mongoose.Types.ObjectId().toString(),
+        senderId: userData?.id,
+        conversationId: conversationId,
+        chat: userData?.content || "",
+        relation: relation || "Unknown",
+        vector,
+      });
+    }
+  }
+};
 export const OpenAIService = {
   embedding,
   chatWithAI,
   enhanceWithAI,
   genarateAiResponses,
   genarateAssistantResponses,
+  chatBehavior,
+  updateChat,
 };
