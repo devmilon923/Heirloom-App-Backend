@@ -11,19 +11,20 @@ import { AssistantChats } from "./assistantChat.model";
 const sendAssistantMessage = catchAsync(async (req: Request, res: Response) => {
   const myMessage = req.body?.me;
   const userId = (req.user as IUserPayload)?.id; // Use type assertion to access id
+  const user_name = (req.user as IUserPayload)?.name; // Use type assertion to access id
   if (!myMessage) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Your message is required");
   }
   if (!userId) {
     throw new ApiError(httpStatus.BAD_REQUEST, "User ID is required");
   }
+  AssistantChatServices.sendAssistantMessage(myMessage, userId, user_name);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Message sent successfully!",
     data: myMessage,
   });
-  await AssistantChatServices.sendAssistantMessage(myMessage, userId);
 });
 
 const getMyAssistantConversations = catchAsync(
@@ -38,7 +39,7 @@ const getMyAssistantConversations = catchAsync(
     const data = await AssistantChatServices.getMyAssistantConversations(
       userId,
       limit,
-      skip,
+      skip
     );
     const totalData = await AssistantChats.countDocuments({ user: userId });
     const pagination = paginationBuilder({
@@ -53,7 +54,7 @@ const getMyAssistantConversations = catchAsync(
       message: "Assistant conversations fetched successfully!",
       data: { chat: data?.reverse(), pagination },
     });
-  },
+  }
 );
 
 export const AssistantChatControllers = {

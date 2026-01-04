@@ -326,7 +326,5 @@ export const sendSocketAssistantStream = (userId: string, content: string) => {
   const userSocket = connectedUsers.get(userId);
   if (userSocket) {
     io.to(userSocket.socketID).emit("assistant-stream", { content });
-  } else {
-    console.log(`Assistant stream: User ${userId} not online`);
   }
 };

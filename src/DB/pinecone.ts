@@ -72,15 +72,13 @@ const saveJournal = async ({
 type TSaveAssistantChat = {
   vector: number[];
   userId: string;
-  assistant_message: string;
-  my_message: string;
+  summaries: string;
   id?: string;
 };
 const saveAssistantChat = async ({
   vector,
   userId,
-  assistant_message,
-  my_message,
+  summaries,
   id,
 }: TSaveAssistantChat) => {
   await assistantchatCollection.upsert([
@@ -89,8 +87,7 @@ const saveAssistantChat = async ({
       values: vector,
       metadata: {
         user: userId?.toString(), // ensure string
-        assistant_message: assistant_message,
-        my_message: my_message,
+        summaries,
         createdAt: new Date().toISOString(),
       },
     },
