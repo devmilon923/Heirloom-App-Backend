@@ -1,10 +1,7 @@
-import { PineconeCollections } from "../../DB/pinecone";
+
 import { OpenAIService } from "../../utils/openAI";
 import { AssistantChats } from "./assistantChat.model";
 import mongoose from "mongoose";
-import { sendSocketAssistantStream } from "../../utils/socket";
-import { TModes } from "../../modules/user/user.interface";
-import { TRelation } from "../../modules/friends/friends.interface";
 import { cacheManagerService } from "../../utils/cacheManager";
 
 const sendAssistantMessage = async (

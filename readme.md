@@ -1,88 +1,87 @@
-# Heirloom Backend
+# Heirloom - AI-Powered Personal Assistant
 
-A real-time chat and notification backend built with Node.js, MongoDB, Pinecone, Firebase, and Socket.IO. Supports 1-to-1 messaging, assistant chat (AI), push notifications, and rich relationship management.
+An intelligent personal assistant that remembers your conversations, understands your relationships, and provides contextual support across all your interactions. Built with advanced memory architecture and real-time conversation analysis.
 
-## Features
+## What Makes Heirloom Special
 
-- **Real-time Chat:** 1-to-1 messaging with read receipts, media, and AI assistant support.
-- **Assistant Chat:** AI-powered assistant using OpenAI, Pinecone for vector search, and streaming responses.
-- **Push Notifications:** Firebase Cloud Messaging (FCM) for device notifications.
-- **Relationship Management:** Rich family/friend relationship types and statuses.
-- **Socket.IO:** Real-time updates for messages, conversations, and notifications.
-- **Robust MongoDB Models:** For users, messages, conversations, friends, and assistant chats.
-- **Efficient Data Handling:** Optimized for low latency and type safety.
+**Dual-Memory Architecture**
+- **Short-term memory:** Handles your active conversation context for immediate, relevant responses
+- **Long-term memory:** Stores and recalls important information across sessions with enhanced reasoning capabilities
 
-## Tech Stack
+**Intelligent Chat Behavior Monitor**
+- Automatically analyzes conversations in real-time
+- Detects and saves relevant information to long-term memory without manual intervention
+- Ensures contextual awareness across all your chat sessions
 
-- **Node.js** (TypeScript)
-- **MongoDB** (Mongoose)
-- **Pinecone** (Vector DB for semantic search)
-- **OpenAI** (Assistant/AI chat)
-- **Firebase Admin SDK** (Push notifications)
-- **Socket.IO** (Real-time communication)
-- **Bull** (Background jobs/queues)
+**Smart Chat Isolation**
+- Secure separation between different conversation threads
+- Each conversation maintains its own independent context
+- Multi-user support with complete data privacy
 
-## Project Structure
+**Relationship-Aware System**
+- Understands and tracks your family and friend relationships
+- Provides context-appropriate responses based on relationship types
+- Manages legacy messages and memory sharing with trusted contacts
 
-```
-src/
-  modules/
-    messages/         # Messaging logic, models, controllers
-    Assistant/        # Assistant chat logic
-    friends/          # Friend/relationship management
-    notifications/    # Push notification logic
-    user/             # User management
-  utils/              # Shared utilities (socket, formatting, etc.)
-  DB/                 # Pinecone and DB integrations
-  bull/               # Queue processing
-public/images/        # Uploaded images
-logs/                 # Log files
-```
+## Key Features
 
-## Setup
+✓ **User-Specific Memory Retention** - Your conversations and preferences are remembered uniquely for you
+
+✓ **Relationship Tracking** - Recognizes connections with family members and friends (parents, siblings, grandparents, cousins, in-laws, and more)
+
+✓ **Contextual Understanding** - Maintains conversation context across multiple sessions and topics
+
+✓ **Real-Time Messaging** - Instant 1-to-1 communication with read receipts and media support
+
+✓ **Push Notifications** - Stay updated with Firebase Cloud Messaging integration
+
+✓ **Friend & Family Access Controls** - Manage who can interact with your assistant and shared memories
+
+## Technology Stack
+
+- **Backend:** Node.js with TypeScript for type-safe, scalable architecture
+- **Database:** MongoDB for flexible data storage and retrieval
+- **Vector Database:** Pinecone for intelligent semantic search and context retrieval
+- **AI Integration:** OpenAI API for natural language understanding and generation
+- **Real-Time Communication:** Socket.IO for instant message delivery
+- **Notifications:** Firebase Admin SDK for cross-platform push notifications
+- **Caching:** Redis for optimized performance and quick data access
+
+## Quick Setup
 
 1. **Install dependencies:**
-
    ```bash
    npm install
    ```
 
 2. **Configure environment:**
+   - Create a `.env` file with your MongoDB, Firebase, Pinecone, and OpenAI credentials
+   - Add your Firebase service account JSON file
 
-   - Set up your `.env` file with MongoDB, Firebase, Pinecone, and OpenAI credentials.
-   - Place your Firebase service account JSON at the configured path.
-
-3. **Run the server:**
-
+3. **Start the server:**
    ```bash
    npm run dev
    ```
 
-4. **(Optional) Start Bull queue workers:**
-   ```bash
-   npm run bull
-   ```
+## Use Cases
 
-## Key Endpoints
+- Personal journal with intelligent memory retention
+- Mood tracking and emotional support companion
+- Family legacy preservation and shared memories
+- Contextual reminders based on conversations
+- Relationship-aware communication assistant
 
-- `POST /api/v1/message/send` — Send a message (real-time + AI support)
-- `GET /api/v1/assistant/conversations` — Get assistant chat history
-- `POST /api/v1/assistant/send` — Send a message to the assistant
-- `POST /api/v1/notifications/push` — Send push notification
+## Privacy & Security
 
-## Relationships
-
-Supported relationship types (see `src/modules/friends/friends.interface.ts`):
-
-- friend, mother, father, sister, brother, son, daughter, grandmother, grandfather, grandson, granddaughter, aunt, uncle, cousin, nephew, niece, mother-in-law, father-in-law, brother-in-law, sister-in-law, stepmother, stepfather, stepbrother, stepsister
-
-## Contributing
-
-1. Fork the repo
-2. Create a feature branch
-3. Commit your changes
-4. Open a pull request
+- End-to-end conversation isolation
+- User-specific data encryption
+- Granular access controls for shared memories
+- Secure authentication and authorization
 
 ## License
 
 MIT
+
+---
+
+*Heirloom - Your memories, relationships, and conversations, intelligently preserved.*
