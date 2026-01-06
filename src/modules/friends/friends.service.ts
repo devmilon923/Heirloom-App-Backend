@@ -123,20 +123,28 @@ const makeAction = async (
       result?.sendBy,
       result?.reciveBy
     );
-    const safeUserId = typeof userId ? userId.toString() : userId?.toString();
+    const safeReceiver = typeof userId ? userId.toString() : userId?.toString();
+    const safeSender = typeof result?.reciveBy
+      ? result?.reciveBy.toString()
+      : result?.reciveBy?.toString();
 
     // Format the conversation data (assuming it's for socket broadcasting)
-    const formattedData = await formatConversationData(
+    const formattedDataForSender = await formatConversationData(
       conversation?._id,
-      safeUserId
+      safeSender
+    );
+    const formattedDataForReciver = await formatConversationData(
+      conversation?._id,
+      safeReceiver
     );
 
     // Send the formatted conversation data to both users via socket
-    sendSocketConversation(formattedData, [
-      formattedData?.sender_id,
-      formattedData?.reciver_id,
+    sendSocketConversation(formattedDataForSender, [
+      new mongoose.Types.ObjectId(safeReceiver),
     ]);
-
+    sendSocketConversation(formattedDataForReciver, [
+      new mongoose.Types.ObjectId(safeReceiver),
+    ]);
     // Optionally update the inbox socket stacks (not sure of the logic here, but this seems like another event to be broadcasted)
     await sendInboxSocketStacks(userId?.toString());
   }
