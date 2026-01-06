@@ -14,7 +14,7 @@ import { formatConversationData } from "../../utils/formatted";
 const sendRequest = async (
   from: Types.ObjectId,
   to: Types.ObjectId,
-  relation: TRelationStatus,
+  relation: TRelationStatus
 ) => {
   const result = await Friends.findOneAndUpdate(
     {
@@ -30,7 +30,7 @@ const sendRequest = async (
     {
       new: true,
       upsert: true,
-    },
+    }
   );
   return result;
 };
@@ -94,7 +94,7 @@ const pepoleSearch = async (query: any, page: number, limit: number) => {
 const makeAction = async (
   userId: Types.ObjectId,
   requestId: Types.ObjectId,
-  action: string,
+  action: string
 ) => {
   // Find the friend request and update its status
   const result = await Friends.findOneAndUpdate(
@@ -108,7 +108,7 @@ const makeAction = async (
     },
     {
       new: true, // Return the updated document after the update
-    },
+    }
   );
 
   // If no matching document was found, throw an error
@@ -121,13 +121,14 @@ const makeAction = async (
     // Create a new conversation when the friend request is accepted
     const conversation = await MessagesServices.createConversation(
       result?.sendBy,
-      result?.reciveBy,
+      result?.reciveBy
     );
+    const safeUserId = typeof userId ? userId.toString() : userId?.toString();
 
     // Format the conversation data (assuming it's for socket broadcasting)
     const formattedData = await formatConversationData(
       conversation?._id,
-      userId?.toString(),
+      safeUserId
     );
 
     // Send the formatted conversation data to both users via socket
@@ -146,7 +147,7 @@ const makeAction = async (
 
 const unfriendAction = async (
   requestId: Types.ObjectId,
-  userId: Types.ObjectId,
+  userId: Types.ObjectId
 ) => {
   const result = await Friends.findOneAndUpdate(
     {
@@ -159,7 +160,7 @@ const unfriendAction = async (
     },
     {
       new: true,
-    },
+    }
   );
   if (!result) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Invalid request");
