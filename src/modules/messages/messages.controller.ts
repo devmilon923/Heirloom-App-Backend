@@ -85,7 +85,7 @@ const sendMessage = catchAsync(async (req: Request, res: Response) => {
       if (receiverId) {
         const checkReciverMode = await checkAIMode(
           conversation,
-          new mongoose.Types.ObjectId(receiverId)
+          new mongoose.Types.ObjectId(receiverId),
         );
 
         if (checkReciverMode) {
@@ -96,6 +96,9 @@ const sendMessage = catchAsync(async (req: Request, res: Response) => {
             await cacheManagerService.getUserRedisMessageWindow({
               windowId: conversation.toString(),
             });
+          console.log("=====================check");
+          console.log(result?.message?.reciver);
+          console.log(receiverId);
           const reply = await OpenAIService.genarateAiResponses({
             chatQuery: {
               conversationId: conversation.toString(),
@@ -122,7 +125,7 @@ const sendMessage = catchAsync(async (req: Request, res: Response) => {
             userId,
             receiverId,
             result,
-            req.body
+            req.body,
           );
         }
       }
@@ -148,7 +151,7 @@ function emitToBothParties(
   senderId: string,
   receiverId: string,
   result: any,
-  body: any
+  body: any,
 ) {
   const senderSocket = connectedUsers.get(senderId?.toString());
   const receiverSocket = connectedUsers.get(receiverId?.toString());
@@ -163,13 +166,13 @@ function emitToBothParties(
   if (senderSocket) {
     io.to(senderSocket.socketID).emit(
       `getNewMessage-${conversation}`,
-      socketPayload
+      socketPayload,
     );
   }
   if (receiverSocket) {
     io.to(receiverSocket.socketID).emit(
       `getNewMessage-${conversation}`,
-      socketPayload
+      socketPayload,
     );
   }
   Messages.create({
@@ -182,7 +185,7 @@ function emitToBothParties(
     // Use the same safeSender/safeReceiver logic as in messages.service
     const safeSender = messageData?.sender_id?.toString();
     const safeReceiver = senderId?.toString();
-     cacheManagerService.addMessageInRedisWindow({
+    cacheManagerService.addMessageInRedisWindow({
       windowId: body.conversation?.toString(),
       chat: {
         sender_name: messageData?.sender_name || null,
@@ -191,16 +194,16 @@ function emitToBothParties(
         relation: result?.relationData?.relation || "Unknown",
       },
     });
-     OpenAIService.updateChat({
+    OpenAIService.updateChat({
       userId: messageData?.sender_id,
       conversationId: body.conversation?.toString(),
       relation: result?.relationData?.relation || "Unknown",
     });
-     MessagesServices.updateConversation(
+    MessagesServices.updateConversation(
       new mongoose.Types.ObjectId(body?.conversation),
       new mongoose.Types.ObjectId(safeReceiver),
       new mongoose.Types.ObjectId(safeSender),
-      message?._id
+      message?._id,
     );
     const [formattedDataForSender, _senderStack] = await Promise.all([
       formatConversationData(body?.conversation, safeSender),
@@ -228,7 +231,7 @@ const aimode = catchAsync(async (req: Request, res: Response) => {
   const result = await MessagesServices.updateAiStatus(
     conversationId,
     status,
-    new mongoose.Types.ObjectId(userId)
+    new mongoose.Types.ObjectId(userId),
   );
   await cacheManagerService.setConversation({ conversationId, data: result });
   return sendResponse(res, {
@@ -282,7 +285,7 @@ const messageStack = catchAsync(async (req: Request, res: Response) => {
     throw new ApiError(
       error.statusCode || 500,
       error.message ||
-        "Unexpected error occurred while retrieving user information."
+        "Unexpected error occurred while retrieving user information.",
     );
   }
 });

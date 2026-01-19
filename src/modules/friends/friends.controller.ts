@@ -8,22 +8,65 @@ import mongoose, { Types } from "mongoose";
 import { RelationEnum } from "./friends.interface";
 import ApiError from "../../errors/ApiError";
 import { Friends } from "./friends.model";
+import { findRelation } from "../../utils/checkRelation";
 
 const sendRequest = catchAsync(async (req: Request, res: Response) => {
-  const userId = (req.user as IUserPayload).id;
+  const maleRelations = [
+    "father",
+    "brother",
+    "son",
+    "grandfather",
+    "grandson",
+    "uncle",
+    "nephew",
+    "father-in-law",
+    "brother-in-law",
+    "stepfather",
+    "stepbrother",
+    "cousin",
+    "friend",
+  ];
+
+  const femaleRelations = [
+    "mother",
+    "sister",
+    "daughter",
+    "grandmother",
+    "granddaughter",
+    "aunt",
+    "niece",
+    "mother-in-law",
+    "sister-in-law",
+    "stepmother",
+    "stepsister",
+    "cousin",
+    "friend",
+  ];
+  const user = req.user as IUserPayload;
   const reciveBy = req.body?.reciveBy;
   const relation = req.body?.relation;
+  const isValidGenderRelation =
+    (user?.gender === "male" && maleRelations?.includes(relation)) ||
+    (user?.gender === "female" && femaleRelations?.includes(relation));
+
+  if (!isValidGenderRelation) {
+    throw new ApiError(
+      httpStatus.BAD_GATEWAY,
+      "Your gender and relation role are not match",
+    );
+  }
   if (!reciveBy) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Reciver not found");
   }
   if (!relation) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Relation field is required");
   }
+
   if (!RelationEnum?.includes(relation?.toLocaleLowerCase())) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Unsupported relation.");
   }
   const result = await FriendServices.sendRequest(
-    new Types.ObjectId(userId),
+    new Types.ObjectId(user?.id),
     new Types.ObjectId(reciveBy),
     relation,
   );
@@ -111,17 +154,49 @@ const action = catchAsync(async (req: Request, res: Response) => {
     throw new ApiError(httpStatus.BAD_REQUEST, "Unsupported action");
   }
 
-  const result = await FriendServices.makeAction(
-    new Types.ObjectId(userId),
-    new Types.ObjectId(requestId),
-    status,
+  if (status === "accepted") {
+    const getRelation = await findRelation({
+      userId: new mongoose.Types.ObjectId(userId),
+      requestId: new mongoose.Types.ObjectId(requestId),
+    });
+    if (!getRelation?.myRelation) {
+      throw new ApiError(httpStatus.BAD_REQUEST, "Relation mismatch.");
+    }
+    Friends.create({
+      sendBy: userId,
+      relation: getRelation?.myRelation,
+      reciveBy: getRelation?.reciveBy,
+      status: "accepted",
+    });
+  }
+
+  const result = await Friends.findOneAndUpdate(
+    {
+      _id: requestId,
+      reciveBy: userId,
+      status: "requested",
+    },
+    {
+      status,
+    },
+    {
+      new: true,
+    },
   );
-  return sendResponse(res, {
+
+  if (!result) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Invalid action"); // Handle invalid action case
+  }
+  sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,
     message: "Requst updated successfully!",
     data: result,
   });
+  await FriendServices.makeRealtimeAction(
+    new mongoose.Types.ObjectId(userId),
+    result,
+  );
 });
 const unfriendAction = catchAsync(async (req: Request, res: Response) => {
   const userId = (req.user as IUserPayload).id;
@@ -148,17 +223,8 @@ const getList = catchAsync(async (req: Request, res: Response) => {
   const normalizedRelation = relation?.toLowerCase();
 
   let query: any = {
-    $or: [
-      {
-        reciveBy: new mongoose.Types.ObjectId(userId),
-      },
-      {
-        sendBy: new mongoose.Types.ObjectId(userId),
-      },
-    ],
+    sendBy: new mongoose.Types.ObjectId(userId),
     status: "accepted",
-    // reciveBy: new mongoose.Types.ObjectId(userId),
-    // reciveBy: { $ne: new mongoose.Types.ObjectId(userId) },
   };
 
   if (normalizedRelation === "friend") {

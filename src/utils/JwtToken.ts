@@ -15,6 +15,7 @@ export type TokenData = {
   name: string;
   email: string;
   role: string;
+  gender: string;
   username: string;
   image: string;
   iat: number;
@@ -28,19 +29,21 @@ export function generateToken({
   id,
   role,
   email,
+  gender,
   name,
   username,
   image,
 }: {
   id: string;
   role: string;
+  gender?: string;
   email: string;
   name: string;
   username: string;
   image: string;
 }): string {
   return sign(
-    { id, role, email, name, username, image },
+    { id, role, email, name, gender, username, image },
     JWT_SECRET_KEY as string,
     {
       expiresIn: "7d",

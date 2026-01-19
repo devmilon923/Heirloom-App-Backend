@@ -9,7 +9,7 @@ import { chunkText } from "../user/user.utils";
 import { PineconeCollections } from "../../DB/pinecone";
 
 const addJournals = async (body: TJournals, userId: Types.ObjectId) => {
-  const chunk = chunkText(body?.content, 200);
+  const chunk = chunkText(body?.content, 300);
   const result = await JournalsDB.create({
     ...body,
     customDate: new Date(body.customDate),
@@ -19,9 +19,7 @@ const addJournals = async (body: TJournals, userId: Types.ObjectId) => {
   Promise.all(
     chunk.map(async (data, index) => {
       // Add index parameter
-      const vector = await OpenAIService.embedding(
-        `journal title: ${body?.title} and journal body: ${data}`,
-      );
+      const vector = await OpenAIService.embedding(data);
 
       await PineconeCollections.saveJournal({
         vector: vector,

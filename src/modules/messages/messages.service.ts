@@ -46,7 +46,7 @@ const updateConversation = async (
   conId: Types.ObjectId,
   sender: Types.ObjectId,
   reciver: Types.ObjectId,
-  messageId?: Types.ObjectId
+  messageId?: Types.ObjectId,
 ) => {
   try {
     const conversation = await Conversations.findOneAndUpdate(
@@ -56,7 +56,7 @@ const updateConversation = async (
       },
       {
         lastMessage: messageId,
-      }
+      },
     );
 
     return conversation;
@@ -68,7 +68,7 @@ const updateConversation = async (
 const updateAiStatus = async (
   conversationId: Types.ObjectId,
   status: boolean,
-  userId: Types.ObjectId
+  userId: Types.ObjectId,
 ) => {
   let updated;
   if (status === true) {
@@ -76,7 +76,7 @@ const updateAiStatus = async (
     updated = await Conversations.findOneAndUpdate(
       { _id: conversationId, participants: { $in: userId } },
       { $addToSet: { ai_user: userId } },
-      { new: true }
+      { new: true },
     );
     if (!updated) {
       throw new Error("Conversation not found or user not a participant.");
@@ -87,7 +87,7 @@ const updateAiStatus = async (
     updated = await Conversations.findOneAndUpdate(
       { _id: conversationId, participants: { $in: userId } },
       { $pull: { ai_user: userId } },
-      { new: true }
+      { new: true },
     );
     if (!updated) {
       throw new Error("Conversation not found or user not a participant.");
@@ -98,7 +98,7 @@ const updateAiStatus = async (
 const createConversation = async (
   sender: Types.ObjectId,
   receiver: Types.ObjectId,
-  messageId?: Types.ObjectId
+  messageId?: Types.ObjectId,
 ) => {
   try {
     const participants = [sender, receiver].sort(); // always sort for consistency
@@ -106,7 +106,7 @@ const createConversation = async (
     let conversation = await Conversations.findOneAndUpdate(
       { participants: { $all: participants, $size: 2 } },
       { $set: { lastMessage: messageId || null } },
-      { new: true }
+      { new: true },
     );
 
     // If not found, create a new one
@@ -121,7 +121,7 @@ const createConversation = async (
     const populatedConversation = await (
       await conversation.populate(
         "participants",
-        "name activeStatus username image"
+        "name activeStatus username image",
       )
     ).populate({
       path: "lastMessage",
@@ -151,7 +151,7 @@ const getMessages = async (
   conversationId: Types.ObjectId,
   userId: Types.ObjectId,
   page: number,
-  limit: number
+  limit: number,
 ) => {
   const skip = (page - 1) * limit;
   try {
@@ -211,7 +211,7 @@ const getMessages = async (
       },
       {
         $addToSet: { readBy: userId },
-      }
+      },
     );
     // Calculate total pages
     const totalPages = Math.ceil(totalMessages / limit);
@@ -237,7 +237,7 @@ const getMedia = async (
   conversationId: Types.ObjectId,
   userId: Types.ObjectId,
   page: number,
-  limit: number
+  limit: number,
 ) => {
   const skip = (page - 1) * limit;
   try {
@@ -260,7 +260,7 @@ const getMedia = async (
       .limit(limit)
       .exec();
     const responseData = messages?.map(
-      (message: any) => message?.image?.publicFileURL || ""
+      (message: any) => message?.image?.publicFileURL || "",
     );
     const totalMessages = await Messages.countDocuments({
       conversation: conversationId,
@@ -287,7 +287,7 @@ const getMedia = async (
       },
       {
         $addToSet: { readBy: userId },
-      }
+      },
     );
     // Calculate total pages
     const totalPages = Math.ceil(totalMessages / limit);
@@ -313,7 +313,7 @@ const getConversation = async (
   userId: Types.ObjectId,
   page: number,
   limit: number,
-  searchQ?: string
+  searchQ?: string,
 ) => {
   const skip = (page - 1) * limit;
 
@@ -337,7 +337,8 @@ const getConversation = async (
   let formattedData = await Promise.all(
     conversations.map(async (data: any) => {
       const otherParticipant = data?.participants?.find(
-        (participant: any) => participant?._id.toString() !== userId?.toString()
+        (participant: any) =>
+          participant?._id.toString() !== userId?.toString(),
       );
       const sender = data?.lastMessage?.sendBy?._id || userId;
       const recevier =
@@ -366,14 +367,14 @@ const getConversation = async (
         activeStatus:
           data?.lastMessage?.activeStatus || otherParticipant?.activeStatus,
       };
-    })
+    }),
   );
 
   // Search functionality remains the same
   if (searchQ && searchQ.trim() !== "") {
     const searchLower = searchQ.toLowerCase();
     formattedData = formattedData.filter((conv: any) =>
-      conv?.name?.toLowerCase().includes(searchLower)
+      conv?.name?.toLowerCase().includes(searchLower),
     );
   }
 
@@ -394,24 +395,17 @@ const getConversation = async (
     },
   };
 };
-// Service function to handle sending a message in a conversation
 const sendMessage = async (body: TMessages) => {
-  // 1. Check if the conversation exists
   const hasConversation: any = await findConversation(body?.conversation);
   if (!hasConversation) {
-    // If not, throw an error
     throw new ApiError(httpStatus.BAD_REQUEST, "Invalid conversation");
   }
-  // 2. Find the receiver (the other participant in the conversation)
   const receiverId = hasConversation.participants.find(
-    (pati: any) => !pati.equals(new mongoose.Types.ObjectId(body.sender))
+    (pati: any) => !pati.equals(new mongoose.Types.ObjectId(body.sender)),
   );
 
-  // Determine sender and receiver for this message
   const sender = hasConversation.lastMessage?.sendBy || body.sender;
   const receiver = hasConversation.lastMessage?.reciveBy || receiverId;
-
-  // Defensive: ensure only ObjectId is used for readBy and all downstream logic
   const safeSender =
     typeof sender === "object" && sender?._id
       ? sender._id.toString()
@@ -421,13 +415,11 @@ const sendMessage = async (body: TMessages) => {
       ? receiver._id.toString()
       : receiver?.toString();
 
-  // 3. In parallel: check relationship and prepare message data
   const [relationData, messageData] = await Promise.all([
     checkMessage({
       recevier: new mongoose.Types.ObjectId(receiver),
       sender: new mongoose.Types.ObjectId(sender),
     }),
-    // Prepare message data concurrently
     Promise.resolve({
       conversation: new mongoose.Types.ObjectId(body.conversation),
       sender: new mongoose.Types.ObjectId(sender),
@@ -437,17 +429,15 @@ const sendMessage = async (body: TMessages) => {
     }),
   ]);
 
-  // If users are not allowed to message each other, throw an error
   if (relationData?.status === false && relationData?.relation === null) {
     throw new ApiError(httpStatus.BAD_REQUEST, "You can't message this person");
   }
 
-  // 4. Create the message and populate sender/receiver fields
   const result = await Messages.create(messageData);
   const populatedResult: any = await Messages.findById(result._id)
-    .populate("sender", "name _id") // Populate sender's name
-    .populate("reciver", "name _id"); // Populate receiver's name
-  // 5. Perform background tasks (embedding, conversation update, socket emission)
+    .populate("sender", "name _id")
+    .populate("reciver", "name _id");
+
   await cacheManagerService.addMessageInRedisWindow({
     windowId: body.conversation?.toString(),
     chat: {
@@ -459,20 +449,16 @@ const sendMessage = async (body: TMessages) => {
   });
   setImmediate(async () => {
     try {
-      // A. If message is text, generate embedding and save to Pinecone
-
-      // B. Update conversation metadata and create conversation if needed
       await Promise.all([
         updateConversation(
           new mongoose.Types.ObjectId(body.conversation),
           new mongoose.Types.ObjectId(receiver),
           new mongoose.Types.ObjectId(sender),
-          result._id
+          result._id,
         ),
         MessagesServices.createConversation(sender, receiver, result._id),
       ]);
 
-      // C. Format conversation data and send socket updates
       const [formattedDataForSender, _senderStack] = await Promise.all([
         formatConversationData(body?.conversation, safeSender),
         sendInboxSocketStacks(safeSender),
@@ -488,12 +474,10 @@ const sendMessage = async (body: TMessages) => {
         new mongoose.Types.ObjectId(safeReceiver),
       ]);
     } catch (error) {
-      // Log any errors that occur during background processing
       console.error("Background processing error:", error);
     }
   });
 
-  // 6. Return the relation data and the populated message (immediate response)
   return { ...relationData, message: populatedResult };
 };
 

@@ -1,4 +1,4 @@
-import mongoose, { Types } from "mongoose";
+import mongoose, { get, Types } from "mongoose";
 import { TRelationStatus } from "./friends.interface";
 import { Friends } from "./friends.model";
 import { MessagesServices } from "../messages/messages.service";
@@ -10,11 +10,12 @@ import {
   sendSocketConversation,
 } from "../../utils/socket";
 import { formatConversationData } from "../../utils/formatted";
+import { findRelation } from "../../utils/checkRelation";
 
 const sendRequest = async (
   from: Types.ObjectId,
   to: Types.ObjectId,
-  relation: TRelationStatus
+  relation: TRelationStatus,
 ) => {
   const result = await Friends.findOneAndUpdate(
     {
@@ -30,7 +31,7 @@ const sendRequest = async (
     {
       new: true,
       upsert: true,
-    }
+    },
   );
   return result;
 };
@@ -91,37 +92,13 @@ const pepoleSearch = async (query: any, page: number, limit: number) => {
     },
   };
 };
-const makeAction = async (
-  userId: Types.ObjectId,
-  requestId: Types.ObjectId,
-  action: string
-) => {
-  // Find the friend request and update its status
-  const result = await Friends.findOneAndUpdate(
-    {
-      _id: requestId,
-      reciveBy: userId,
-      status: "requested", // Check that the request is in the "requested" status
-    },
-    {
-      status: action, // Set the new status based on the provided action
-    },
-    {
-      new: true, // Return the updated document after the update
-    }
-  );
-
-  // If no matching document was found, throw an error
-  if (!result) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Invalid action"); // Handle invalid action case
-  }
-
+const makeRealtimeAction = async (userId: Types.ObjectId, result: any) => {
   // Handle the "accepted" action
-  if (action === "accepted") {
+  if (result?.status === "accepted") {
     // Create a new conversation when the friend request is accepted
     const conversation = await MessagesServices.createConversation(
       result?.sendBy,
-      result?.reciveBy
+      result?.reciveBy,
     );
     const safeSender = typeof userId ? userId.toString() : userId?.toString();
     const receiverId =
@@ -132,11 +109,11 @@ const makeAction = async (
     // Format the conversation data (assuming it's for socket broadcasting)
     const formattedDataForSender = await formatConversationData(
       conversation?._id,
-      safeSender
+      safeSender,
     );
     const formattedDataForReciver = await formatConversationData(
       conversation?._id,
-      receiverId
+      receiverId,
     );
 
     // Send the formatted conversation data to both users via socket
@@ -156,21 +133,45 @@ const makeAction = async (
 
 const unfriendAction = async (
   requestId: Types.ObjectId,
-  userId: Types.ObjectId
+  userId: Types.ObjectId,
 ) => {
+  const getRelation = await findRelation({ userId, requestId });
+  console.log(getRelation);
+  console.log(getRelation.sendBy);
+  if (getRelation.myRelation) {
+    console.log("Inside");
+    await Friends.findOneAndUpdate(
+      {
+        $or: [
+          { reciveBy: getRelation.reciveBy, sendBy: getRelation.sendBy },
+          { sendBy: getRelation.reciveBy, reciveBy: getRelation.sendBy },
+        ],
+        // reciveBy: getRelation.reciveBy,
+        // sendBy: userId,
+        relation: getRelation.myRelation,
+      },
+      {
+        status: "unfriended",
+      },
+    );
+  }
   const result = await Friends.findOneAndUpdate(
     {
-      _id: requestId,
-      $or: [{ sendBy: userId }, { reciveBy: userId }],
-      status: "accepted",
+      $or: [
+        { reciveBy: getRelation.reciveBy, sendBy: getRelation.sendBy },
+        { sendBy: getRelation.reciveBy, reciveBy: getRelation.sendBy },
+      ],
+      // sendBy: userId,
+      // reciveBy: getRelation.reciveBy,
     },
     {
       status: "unfriended",
     },
     {
       new: true,
-    }
+    },
   );
+
   if (!result) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Invalid request");
   }
@@ -189,7 +190,7 @@ const updateRelation = async (query: any, updatedData: any) => {
 export const FriendServices = {
   sendRequest,
   getRequest,
-  makeAction,
+  makeRealtimeAction,
   unfriendAction,
   pepoleSearch,
   updateRelation,
