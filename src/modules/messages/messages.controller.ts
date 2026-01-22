@@ -23,49 +23,40 @@ import { formatConversationData } from "../../utils/formatted";
 
 // Controller to handle sending a message in a conversation
 const sendMessage = catchAsync(async (req: Request, res: Response) => {
-  // Extract conversation ID and message content from request body
   const { conversation, messages } = req.body;
   if (!conversation) {
-    // If conversation ID is missing, throw an error
     throw new ApiError(httpStatus.BAD_REQUEST, "Missing conversation");
   }
 
-  // Get the authenticated user's ID
   const user = req.user as IUserPayload;
   const userId = user.id;
 
-  // Run AI mode check and image processing in parallel for efficiency
   const [checkMyMode, image] = await Promise.all([
     checkAIMode(conversation, new mongoose.Types.ObjectId(userId)),
     processImage(req.file),
   ]);
 
-  // If AI mode is active for the sender, prevent sending a message
   if (checkMyMode) {
     throw new ApiError(httpStatus.BAD_REQUEST, "AI mode is active.");
   }
-  // Ensure at least a message or an image is provided
   if (!req.file && !messages) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Missing message content");
   }
 
-  // Construct the message object to be saved
   const body: TMessages = {
     ...req.body,
     sender: userId,
     image,
   };
 
-  // Save the message using the service layer
   const result: any = await MessagesServices.sendMessage(body);
-  // Immediately send a success response to the client
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Message sent successfully!",
     data: result,
   });
-
   // Perform background tasks (socket notification, AI reply) without blocking the client
   setImmediate(async () => {
     try {
@@ -96,9 +87,10 @@ const sendMessage = catchAsync(async (req: Request, res: Response) => {
             await cacheManagerService.getUserRedisMessageWindow({
               windowId: conversation.toString(),
             });
-          console.log("=====================check");
-          console.log(result?.message?.reciver);
-          console.log(receiverId);
+          // console.log("=====================check");
+          // console.log(result?.message?.reciver);
+
+          // console.log(receiverId);
           const reply = await OpenAIService.genarateAiResponses({
             chatQuery: {
               conversationId: conversation.toString(),
@@ -108,7 +100,7 @@ const sendMessage = catchAsync(async (req: Request, res: Response) => {
             receiver_name: result?.message?.sender?.name,
             journalQuery: { userId: receiverId },
             moods: user?.user_mood || "Unknown",
-            relation: result?.relationData?.relation || "Unknown",
+            relation: result?.relation || "Unknown",
             textPrompt: messages,
             userId: receiverId,
           });

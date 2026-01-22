@@ -67,7 +67,7 @@ const sendRequest = catchAsync(async (req: Request, res: Response) => {
   }
   const result = await FriendServices.sendRequest(
     new Types.ObjectId(user?.id),
-    new Types.ObjectId(reciveBy),
+    new Types.ObjectId(reciveBy || "n/a"),
     relation,
   );
   return sendResponse(res, {
@@ -223,7 +223,7 @@ const getList = catchAsync(async (req: Request, res: Response) => {
   const normalizedRelation = relation?.toLowerCase();
 
   let query: any = {
-    sendBy: new mongoose.Types.ObjectId(userId),
+    reciveBy: new mongoose.Types.ObjectId(userId),
     status: "accepted",
   };
 
